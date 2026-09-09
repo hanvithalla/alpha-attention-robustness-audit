@@ -21,15 +21,14 @@ import torch
 import torchvision
 import torchvision.transforms as transforms
 
+from cifar10c import CORRUPTIONS_4, N_SEVERITIES, load_corruption
+from data_cifar10 import CIFAR10Numpy
 from model import resnet_cifar
 
 CIFAR_MEAN = (0.4914, 0.4822, 0.4465)
 CIFAR_STD = (0.2023, 0.1994, 0.2010)
-CORRUPTIONS = ["brightness", "contrast", "defocus_blur", "elastic_transform"]
 VARIANTS = ["none", "SE", "BAM", "CBAM"]
 MODEL_CHOICES = {"none": None, "SE": "SE", "BAM": "BAM", "CBAM": "CBAM"}
-N_TEST = 10000
-N_SEVERITIES = 5
 
 
 def to_normalized_tensor(images_uint8, device):
@@ -53,7 +52,7 @@ def eval_numpy_batches(model, images, labels, device, batch_size):
 @torch.no_grad()
 def eval_clean(model, data_dir, device, batch_size):
     test_tf = transforms.Compose([transforms.ToTensor(), transforms.Normalize(CIFAR_MEAN, CIFAR_STD)])
-    test_set = torchvision.datasets.CIFAR10(root=data_dir, train=False, download=True, transform=test_tf)
+    test_set = CIFAR10Numpy(root=data_dir, train=False, download=True, transform=test_tf)
     loader = torch.utils.data.DataLoader(test_set, batch_size=batch_size, shuffle=False, num_workers=0)
     model.eval()
     correct, total = 0, 0
@@ -78,6 +77,7 @@ def main():
     parser.add_argument("--ckpt-dir", default="./runs")
     parser.add_argument("--data-dir", default="./data")
     parser.add_argument("--corruption-dir", default="./data/CIFAR-10-C")
+    parser.add_argument("--corruptions", nargs="+", default=CORRUPTIONS_4)
     parser.add_argument("--out-dir", default="./results")
     parser.add_argument("--batch-size", type=int, default=256)
     parser.add_argument("--device", default="cuda" if torch.cuda.is_available() else "cpu")
@@ -94,29 +94,18 @@ def main():
     clean_acc = eval_clean(model, args.data_dir, device, args.batch_size)
     print(f"[{run_name}] clean top-1 accuracy: {clean_acc:.2f}%")
 
-    corruption_dir = Path(args.corruption_dir)
-    labels_path = corruption_dir / "labels.npy"
     rows = [{"model": args.model, "seed": args.seed, "corruption": "clean", "severity": 0, "accuracy": clean_acc}]
     per_corruption_mean = {}
 
-    if not labels_path.exists():
-        print(f"[{run_name}] WARNING: {labels_path} not found -- skipping CIFAR-10-C, clean accuracy only.")
-    else:
-        labels = np.load(labels_path)
-        for corruption in CORRUPTIONS:
-            npy_path = corruption_dir / f"{corruption}.npy"
-            if not npy_path.exists():
-                print(f"  [skip] {corruption}: {npy_path} not found")
-                continue
-            images = np.load(npy_path)
-            sev_accs = []
-            for severity in range(1, N_SEVERITIES + 1):
-                lo, hi = (severity - 1) * N_TEST, severity * N_TEST
-                acc = eval_numpy_batches(model, images[lo:hi], labels[lo:hi], device, args.batch_size)
-                sev_accs.append(acc)
-                rows.append({"model": args.model, "seed": args.seed, "corruption": corruption, "severity": severity, "accuracy": acc})
-                print(f"  {corruption} severity {severity}: {acc:.2f}%")
-            per_corruption_mean[corruption] = float(np.mean(sev_accs))
+    for corruption in args.corruptions:
+        sev_accs = []
+        for severity in range(1, N_SEVERITIES + 1):
+            images, labels = load_corruption(corruption, severity, args.corruption_dir)
+            acc = eval_numpy_batches(model, images, labels, device, args.batch_size)
+            sev_accs.append(acc)
+            rows.append({"model": args.model, "seed": args.seed, "corruption": corruption, "severity": severity, "accuracy": acc})
+            print(f"  {corruption} severity {severity}: {acc:.2f}%")
+        per_corruption_mean[corruption] = float(np.mean(sev_accs))
 
     all_sev_accs = [r["accuracy"] for r in rows if r["corruption"] != "clean"]
     mca = float(np.mean(all_sev_accs)) if all_sev_accs else float("nan")

@@ -31,6 +31,7 @@ import torch.nn as nn
 import torchvision
 import torchvision.transforms as transforms
 
+from data_cifar10 import CIFAR10Numpy
 from model import resnet_cifar
 
 CIFAR_MEAN = (0.4914, 0.4822, 0.4465)
@@ -45,7 +46,7 @@ MODEL_CHOICES = {
 
 # Hyperparameters fixed at the first installment and reused on every resume,
 # so a run's total training config can't drift between installments.
-FROZEN_CONFIG_KEYS = ["model", "seed", "epochs", "batch_size", "lr", "momentum", "weight_decay", "scheduler"]
+FROZEN_CONFIG_KEYS = ["model", "seed", "epochs", "batch_size", "lr", "momentum", "weight_decay", "scheduler", "amp"]
 
 
 def set_seed(seed):
@@ -86,8 +87,8 @@ def get_dataloaders(data_dir, batch_size, num_workers):
         transforms.Normalize(CIFAR_MEAN, CIFAR_STD),
     ])
 
-    train_set = torchvision.datasets.CIFAR10(root=data_dir, train=True, download=True, transform=train_tf)
-    test_set = torchvision.datasets.CIFAR10(root=data_dir, train=False, download=True, transform=test_tf)
+    train_set = CIFAR10Numpy(root=data_dir, train=True, download=True, transform=train_tf)
+    test_set = CIFAR10Numpy(root=data_dir, train=False, download=True, transform=test_tf)
 
     train_loader = torch.utils.data.DataLoader(
         train_set, batch_size=batch_size, shuffle=True, num_workers=num_workers, pin_memory=True, drop_last=True
@@ -98,9 +99,19 @@ def get_dataloaders(data_dir, batch_size, num_workers):
     return train_loader, test_loader
 
 
-def run_epoch(model, loader, criterion, optimizer, device, train, limit_batches=None):
+def run_epoch(model, loader, criterion, optimizer, device, train, limit_batches=None,
+              scaler=None, use_amp=False):
+    """One pass over `loader`.
+
+    Mixed precision is applied to *training only*. Validation stays in fp32 so
+    that the val_acc driving best-checkpoint selection is computed exactly the
+    way evaluate.py computes the final reported accuracy -- otherwise the
+    checkpoint chosen here and the number in the paper come from two slightly
+    different numeric paths.
+    """
     model.train(mode=train)
     total_loss, correct, total = 0.0, 0, 0
+    amp_on = bool(use_amp and train)
     context = torch.enable_grad() if train else torch.no_grad()
     with context:
         for batch_idx, (inputs, targets) in enumerate(loader):
@@ -109,11 +120,17 @@ def run_epoch(model, loader, criterion, optimizer, device, train, limit_batches=
             inputs, targets = inputs.to(device, non_blocking=True), targets.to(device, non_blocking=True)
             if train:
                 optimizer.zero_grad()
-            outputs = model(inputs)
-            loss = criterion(outputs, targets)
+            with torch.amp.autocast(device_type=device.type, enabled=amp_on):
+                outputs = model(inputs)
+                loss = criterion(outputs, targets)
             if train:
-                loss.backward()
-                optimizer.step()
+                if amp_on:
+                    scaler.scale(loss).backward()
+                    scaler.step(optimizer)
+                    scaler.update()
+                else:
+                    loss.backward()
+                    optimizer.step()
 
             total_loss += loss.item() * targets.size(0)
             correct += (outputs.argmax(dim=1) == targets).sum().item()
@@ -149,6 +166,10 @@ def main():
     parser.add_argument("--data-dir", default="./data")
     parser.add_argument("--out-dir", default="./runs")
     parser.add_argument("--device", default="cuda" if torch.cuda.is_available() else "cpu")
+    parser.add_argument("--amp", dest="amp", action="store_true", default=None,
+                         help="Mixed-precision training. Defaults to on for CUDA, off for CPU.")
+    parser.add_argument("--no-amp", dest="amp", action="store_false",
+                         help="Force full fp32 training.")
     parser.add_argument("--time-limit-min", type=float, default=None,
                          help="Stop and checkpoint after this many minutes (this installment only), even if --epochs isn't reached yet.")
     parser.add_argument("--limit-batches", type=int, default=None,
@@ -157,6 +178,12 @@ def main():
     args = parser.parse_args()
 
     device = torch.device(args.device)
+    if args.amp is None:
+        args.amp = device.type == "cuda"
+    if args.amp and device.type != "cuda":
+        print("[warn] --amp requested on a non-CUDA device; falling back to fp32.")
+        args.amp = False
+
     run_name = f"resnet18_{args.model.lower()}_seed{args.seed}"
     out_dir = Path(args.out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -170,23 +197,31 @@ def main():
         state = torch.load(state_path, map_location=device, weights_only=False)  # trusted: written by this script
         frozen = state["config"]
         for key in FROZEN_CONFIG_KEYS:
-            setattr(args, key, frozen[key])  # keep the original run's hyperparameters
+            # .get keeps state files written before a key was frozen loadable
+            setattr(args, key, frozen.get(key, getattr(args, key)))  # keep the original run's hyperparameters
         set_rng_state(state["rng_state"])
         model, criterion, optimizer, scheduler = build_run_objects(args, device)
+        scaler = torch.amp.GradScaler(device.type, enabled=args.amp)
         model.load_state_dict(state["model_state_dict"])
         optimizer.load_state_dict(state["optimizer_state_dict"])
         scheduler.load_state_dict(state["scheduler_state_dict"])
+        if state.get("scaler_state_dict") is not None:
+            # the loss scale is training state: dropping it restarts scale
+            # search mid-run and perturbs the first resumed steps
+            scaler.load_state_dict(state["scaler_state_dict"])
         start_epoch = state["epoch"] + 1
         best_acc = state["best_acc"]
-        print(f"[{run_name}] resuming from epoch {start_epoch}/{args.epochs} (best_acc so far={best_acc:.2f}%)")
+        print(f"[{run_name}] resuming from epoch {start_epoch}/{args.epochs} "
+              f"(best_acc so far={best_acc:.2f}%, amp={args.amp})")
     else:
         set_seed(args.seed)
         model, criterion, optimizer, scheduler = build_run_objects(args, device)
+        scaler = torch.amp.GradScaler(device.type, enabled=args.amp)
         start_epoch = 1
         best_acc = 0.0
         with open(log_path, "w", newline="") as f:
             csv.DictWriter(f, fieldnames=["epoch", "train_loss", "train_acc", "val_loss", "val_acc", "lr", "epoch_time_s"]).writeheader()
-        print(f"[{run_name}] starting fresh, target {args.epochs} epochs")
+        print(f"[{run_name}] starting fresh, target {args.epochs} epochs (amp={args.amp})")
 
     train_loader, test_loader = get_dataloaders(args.data_dir, args.batch_size, args.num_workers)
 
@@ -194,8 +229,10 @@ def main():
     last_epoch_completed = start_epoch - 1
     for epoch in range(start_epoch, args.epochs + 1):
         t0 = time.time()
-        train_loss, train_acc = run_epoch(model, train_loader, criterion, optimizer, device, train=True, limit_batches=args.limit_batches)
-        val_loss, val_acc = run_epoch(model, test_loader, criterion, optimizer, device, train=False, limit_batches=args.limit_batches)
+        train_loss, train_acc = run_epoch(model, train_loader, criterion, optimizer, device, train=True,
+                                          limit_batches=args.limit_batches, scaler=scaler, use_amp=args.amp)
+        val_loss, val_acc = run_epoch(model, test_loader, criterion, optimizer, device, train=False,
+                                      limit_batches=args.limit_batches)
         scheduler.step()
         epoch_time = time.time() - t0
         last_epoch_completed = epoch
@@ -228,6 +265,7 @@ def main():
                 "model_state_dict": model.state_dict(),
                 "optimizer_state_dict": optimizer.state_dict(),
                 "scheduler_state_dict": scheduler.state_dict(),
+                "scaler_state_dict": scaler.state_dict() if args.amp else None,
                 "epoch": epoch,
                 "best_acc": best_acc,
                 "rng_state": get_rng_state(),
