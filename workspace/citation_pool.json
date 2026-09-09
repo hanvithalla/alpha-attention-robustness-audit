@@ -1,0 +1,294 @@
+{
+  "source": "openalex",
+  "verified": [
+    {
+      "key": "hu2018squeeze",
+      "title": "Squeeze-and-Excitation Networks",
+      "year": 2018,
+      "venue": "Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (CVPR)",
+      "doi": "10.1109/cvpr.2018.00745",
+      "openalex_id": "https://openalex.org/W2752782242",
+      "cited_by_count": 30019,
+      "match_ratio": 1.0,
+      "authors": "Jie Hu and Li Shen and Gang Sun",
+      "canonical_override": {
+        "from": {
+          "year": 2018,
+          "venue": ""
+        },
+        "to": {
+          "year": 2018,
+          "venue": "Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (CVPR)"
+        }
+      }
+    },
+    {
+      "key": "park2018bam",
+      "title": "BAM: Bottleneck Attention Module",
+      "year": 2018,
+      "venue": "British Machine Vision Conference (BMVC)",
+      "doi": "10.48550/arxiv.1807.06514",
+      "openalex_id": "https://openalex.org/W2883579164",
+      "cited_by_count": 48,
+      "match_ratio": 1.0,
+      "authors": "Jongchan Park and Sanghyun Woo and Joon\u2010Young Lee and In So Kweon",
+      "canonical_override": {
+        "from": {
+          "year": 2018,
+          "venue": "arXiv (Cornell University)"
+        },
+        "to": {
+          "year": 2018,
+          "venue": "British Machine Vision Conference (BMVC)"
+        }
+      }
+    },
+    {
+      "key": "woo2018cbam",
+      "title": "CBAM: Convolutional Block Attention Module",
+      "year": 2018,
+      "venue": "European Conference on Computer Vision (ECCV)",
+      "doi": "10.1007/978-3-030-01234-2_1",
+      "openalex_id": "https://openalex.org/W2884585870",
+      "cited_by_count": 23480,
+      "match_ratio": 1.0,
+      "authors": "Sanghyun Woo and Jongchan Park and Joon\u2010Young Lee and In So Kweon",
+      "canonical_override": {
+        "from": {
+          "year": 2018,
+          "venue": "Lecture notes in computer science"
+        },
+        "to": {
+          "year": 2018,
+          "venue": "European Conference on Computer Vision (ECCV)"
+        }
+      }
+    },
+    {
+      "key": "hendrycks2019benchmarking",
+      "title": "Benchmarking Neural Network Robustness to Common Corruptions and Perturbations",
+      "year": 2019,
+      "venue": "International Conference on Learning Representations (ICLR)",
+      "doi": "10.48550/arxiv.1903.12261",
+      "openalex_id": "https://openalex.org/W2905631704",
+      "cited_by_count": 306,
+      "match_ratio": 1.0,
+      "authors": "Dan Hendrycks and Thomas G. Dietterich",
+      "canonical_override": {
+        "from": {
+          "year": 2019,
+          "venue": "arXiv (Cornell University)"
+        },
+        "to": {
+          "year": 2019,
+          "venue": "International Conference on Learning Representations (ICLR)"
+        }
+      }
+    },
+    {
+      "key": "he2016deep",
+      "title": "Deep Residual Learning for Image Recognition",
+      "year": 2016,
+      "venue": "Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (CVPR)",
+      "doi": "10.1109/cvpr.2016.90",
+      "openalex_id": "https://openalex.org/W2194775991",
+      "cited_by_count": 228344,
+      "match_ratio": 1.0,
+      "authors": "Kaiming He and Xiangyu Zhang and Shaoqing Ren and Jian Sun",
+      "canonical_override": {
+        "from": {
+          "year": 2016,
+          "venue": ""
+        },
+        "to": {
+          "year": 2016,
+          "venue": "Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (CVPR)"
+        }
+      }
+    },
+    {
+      "key": "ioffe2015batch",
+      "title": "Batch Normalization: Accelerating Deep Network Training by Reducing Internal Covariate Shift",
+      "year": 2015,
+      "venue": "International Conference on Machine Learning (ICML)",
+      "doi": "10.48550/arxiv.1502.03167",
+      "openalex_id": "https://openalex.org/W1836465849",
+      "cited_by_count": 24405,
+      "match_ratio": 1.0,
+      "authors": "Sergey Ioffe and Christian Szegedy",
+      "canonical_override": {
+        "from": {
+          "year": 2015,
+          "venue": "arXiv (Cornell University)"
+        },
+        "to": {
+          "year": 2015,
+          "venue": "International Conference on Machine Learning (ICML)"
+        }
+      }
+    },
+    {
+      "key": "loshchilov2017sgdr",
+      "title": "SGDR: Stochastic Gradient Descent with Warm Restarts",
+      "year": 2017,
+      "venue": "International Conference on Learning Representations (ICLR)",
+      "doi": "10.48550/arxiv.1608.03983",
+      "openalex_id": "https://openalex.org/W2518108298",
+      "cited_by_count": 1735,
+      "match_ratio": 1.0,
+      "authors": "Ilya Loshchilov and Frank Hutter",
+      "canonical_override": {
+        "from": {
+          "year": 2016,
+          "venue": "arXiv (Cornell University)"
+        },
+        "to": {
+          "year": 2017,
+          "venue": "International Conference on Learning Representations (ICLR)"
+        }
+      }
+    },
+    {
+      "key": "micikevicius2018mixed",
+      "title": "Mixed Precision Training",
+      "year": 2018,
+      "venue": "International Conference on Learning Representations (ICLR)",
+      "doi": "10.48550/arxiv.1710.03740",
+      "openalex_id": "https://openalex.org/W2763421725",
+      "cited_by_count": 883,
+      "match_ratio": 1.0,
+      "authors": "Paulius Micikevicius and Sharan Narang and Jonah Alben and Gregory Diamos and Erich Elsen and David Garc\u00eda and Boris Ginsburg and Michael Houston and Oleksii Kuchaiev and Ganesh Venkatesh and Hao Wu",
+      "canonical_override": {
+        "from": {
+          "year": 2017,
+          "venue": "arXiv (Cornell University)"
+        },
+        "to": {
+          "year": 2018,
+          "venue": "International Conference on Learning Representations (ICLR)"
+        }
+      }
+    },
+    {
+      "key": "guo2022attention",
+      "title": "Attention mechanisms in computer vision: A survey",
+      "year": 2022,
+      "venue": "Computational Visual Media",
+      "doi": "10.1007/s41095-022-0271-y",
+      "openalex_id": "https://openalex.org/W3212386989",
+      "cited_by_count": 2495,
+      "match_ratio": 1.0,
+      "authors": "Meng-Hao Guo and Tian-Xing Xu and Jiangjiang Liu and Zheng-Ning Liu and Peng-Tao Jiang and Tai\u2010Jiang Mu and Song\u2013Hai Zhang and Ralph R. Martin and Ming\u2010Ming Cheng and Shi\u2010Min Hu",
+      "canonical_override": null
+    },
+    {
+      "key": "wang2020eca",
+      "title": "ECA-Net: Efficient Channel Attention for Deep Convolutional Neural Networks",
+      "year": 2020,
+      "venue": "Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)",
+      "doi": "10.1109/cvpr42600.2020.01155",
+      "openalex_id": "https://openalex.org/W3034552520",
+      "cited_by_count": 8657,
+      "match_ratio": 1.0,
+      "authors": "Qilong Wang and Banggu Wu and Pengfei Zhu and Peihua Li and Wangmeng Zuo and Qinghua Hu",
+      "canonical_override": {
+        "from": {
+          "year": 2020,
+          "venue": ""
+        },
+        "to": {
+          "year": 2020,
+          "venue": "Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)"
+        }
+      }
+    },
+    {
+      "key": "hendrycks2020augmix",
+      "title": "AugMix: A Simple Data Processing Method to Improve Robustness and Uncertainty",
+      "year": 2020,
+      "venue": "International Conference on Learning Representations (ICLR)",
+      "doi": "10.48550/arxiv.1912.02781",
+      "openalex_id": "https://openalex.org/W2994088087",
+      "cited_by_count": 571,
+      "match_ratio": 1.0,
+      "authors": "Dan Hendrycks and Norman Mu and Ekin D. Cubuk and Barret Zoph and Justin Gilmer and Balaji Lakshminarayanan",
+      "canonical_override": {
+        "from": {
+          "year": 2019,
+          "venue": "arXiv (Cornell University)"
+        },
+        "to": {
+          "year": 2020,
+          "venue": "International Conference on Learning Representations (ICLR)"
+        }
+      }
+    },
+    {
+      "key": "krizhevsky2009learning",
+      "title": "Learning Multiple Layers of Features from Tiny Images",
+      "year": 2009,
+      "venue": "University of Toronto",
+      "doi": "10.57702/zp44cu3g",
+      "openalex_id": "https://openalex.org/W3118608800",
+      "cited_by_count": 25429,
+      "match_ratio": 1.0,
+      "authors": "Alex Krizhevsky",
+      "canonical_override": {
+        "from": {
+          "year": 2024,
+          "venue": ""
+        },
+        "to": {
+          "year": 2009,
+          "venue": "University of Toronto"
+        }
+      }
+    },
+    {
+      "key": "ar2repair2025",
+      "title": "AR2: Attention-Guided Repair for the Robustness of CNNs Against Common Corruptions",
+      "year": 2025,
+      "venue": "arXiv (Cornell University)",
+      "doi": "10.48550/arxiv.2507.06332",
+      "openalex_id": "https://openalex.org/W4416101696",
+      "cited_by_count": 0,
+      "match_ratio": 1.0,
+      "authors": "Fuyuan Zhang and Qichen Wang and Jianjun Zhao",
+      "canonical_override": null
+    },
+    {
+      "key": "pushpull2025",
+      "title": "Multi-Scale Unrectified Push-Pull with Channel Attention for Enhanced Corruption Robustness",
+      "year": 2025,
+      "venue": "Proceedings of the AAAI Symposium Series",
+      "doi": "10.1609/aaaiss.v6i1.36022",
+      "openalex_id": "https://openalex.org/W4412843094",
+      "cited_by_count": 4,
+      "match_ratio": 1.0,
+      "authors": "Robin Narsingh Ranabhat and Longwei Wang and Xiao Qin and Yang Zhou and KC Santosh",
+      "canonical_override": null
+    },
+    {
+      "key": "geirhos2019imagenet",
+      "title": "ImageNet-trained CNNs are biased towards texture; increasing shape bias improves accuracy and robustness",
+      "year": 2019,
+      "venue": "International Conference on Learning Representations (ICLR)",
+      "doi": "10.48550/arxiv.1811.12231",
+      "openalex_id": "https://openalex.org/W2902617128",
+      "cited_by_count": 663,
+      "match_ratio": 1.0,
+      "authors": "Robert Geirhos and Patricia Rubisch and Claudio Michaelis and Matthias Bethge and Felix A. Wichmann and Wieland Brendel",
+      "canonical_override": {
+        "from": {
+          "year": 2018,
+          "venue": "arXiv (Cornell University)"
+        },
+        "to": {
+          "year": 2019,
+          "venue": "International Conference on Learning Representations (ICLR)"
+        }
+      }
+    }
+  ],
+  "unverified": []
+}

@@ -1,0 +1,165 @@
+\section{Introduction}
+
+Channel and spatial attention blocks are among the cheapest architectural
+additions in modern computer vision. A handful of extra parameters inserted
+into an existing backbone is reported to buy a consistent accuracy gain, and
+squeeze-and-excitation~\cite{hu2018squeeze}, the bottleneck attention
+module~\cite{park2018bam}, and the convolutional block attention
+module~\cite{woo2018cbam} have become canonical instances of the
+pattern~\cite{guo2022attention}. Their reported gains are the reason the
+applied literature routinely bolts them onto convolutional networks.
+
+Those gains are all reported on clean test data. Each of these methods is
+evaluated on top-1 and top-5 accuracy, and one of them positions itself
+explicitly as an improvement over the channel-only design of another on
+precisely that basis. None reports how the resulting models behave when the
+input distribution shifts.
+
+This matters because the ordering these papers induce is what a practitioner
+actually consumes. Someone selecting an attention block for a deployed
+classifier reads off a ranking that was measured under conditions the
+deployment will not reproduce: sensors defocus, illumination drifts, contrast
+collapses, images are recompressed in transit. Convolutional classifiers are
+known to be brittle to exactly these
+perturbations~\cite{hendrycks2019benchmarking,geirhos2019imagenet}, and a
+substantial literature now treats corruption robustness as a first-class
+evaluation axis~\cite{hendrycks2020augmix}. The question that follows is
+therefore not whether attention blocks improve clean accuracy, but whether the
+\emph{ordering} they induce on clean data is the ordering that survives
+corruption.
+
+The existing literature cannot answer this, for two reasons. First, each method
+is validated in its own backbone, at its own scale, under its own training
+recipe, so a cross-paper accuracy difference conflates the module with the
+architecture and the optimisation schedule. Second, and more subtly, two of the
+three modules considered here originate from a single shared public
+implementation and inherit a common insertion convention that an independently
+reimplemented third does not; even a same-codebase comparison therefore
+confounds module identity with module placement.
+
+We remove both confounds. All three attention blocks, plus an attention-free
+baseline, are trained into one shared CIFAR-scale residual
+backbone~\cite{he2016deep}, with each module inserted at the identical point in
+the identical block, under an identical optimiser, schedule, augmentation
+policy, epoch budget and seed set. Because the module is the only term that
+varies, any measured difference is attributable to the module itself. We then
+evaluate the trained checkpoints, without retraining, on a common-corruption
+benchmark that shares the clean dataset's exact label space and
+resolution~\cite{hendrycks2019benchmarking,krizhevsky2009learning}, and re-rank
+the arms by mean corruption accuracy and by a relative degradation measure
+rather than by clean top-1.
+
+Our hypothesis is that the ranking may not be invariant. Channel-only
+recalibration derives its gate from a globally pooled descriptor, whereas the
+spatial branches of the other two modules compute attention from local feature
+statistics. Spatial masks depend on where informative structure lies in the
+image, and corruptions such as defocus blur and contrast reduction attack that
+structure directly, so a spatial gate that mislocalises under corruption could
+degrade faster than a channel-only gate. We stress in advance that the
+competing outcome is equally informative: if the clean ordering is preserved at
+every severity, then the field's single metric was not misleading for this
+method set, which is a positive and useful finding obtainable only by running
+the experiment. We commit to this symmetry before reporting results so that a
+null cannot later be reframed as a failed study.
+
+Our contributions are:
+
+\begin{itemize}
+  \item \textbf{A matched-budget, single-backbone comparison} of three
+    published attention blocks against an attention-free baseline, in which
+    backbone, insertion point, optimiser, schedule, augmentation and seed set
+    are all held fixed, so that differences are attributable to the module
+    rather than to its host or its placement.
+  \item \textbf{A ranking-stability analysis} that reports whether the
+    clean-accuracy ordering is preserved at each corruption severity, on both
+    mean corruption accuracy and a starting-point-normalised relative
+    degradation measure, with the per-corruption-type breakdown reported
+    alongside the aggregate so that a skewed average is visible rather than
+    hidden, and with an explicit check of whether the measured gaps exceed
+    seed noise before any ordering is claimed.
+  \item \textbf{A provenance record} for the compared implementations,
+    including a discrepancy between the fusion rule one of these modules
+    specifies in its paper and the fusion its official public code computes,
+    which to our knowledge has not previously been reported.
+  \item \textbf{Practical selection guidance}: whether the clean-accuracy
+    ranking a practitioner would read off the original papers is the ranking
+    that should drive the choice, or whether corruption robustness reorders it.
+\end{itemize}
+
+The remainder of the paper is organised as follows. Section~\ref{sec:related}
+positions the work against attention-block design, corruption-robustness
+benchmarking, and their recent intersection. Section~\ref{sec:method} describes
+the shared backbone, the module implementations and their provenance, and the
+mechanical fidelity checks. Section~\ref{sec:setup} gives the matched training
+protocol and the metrics. Section~\ref{sec:results} reports the results and
+answers the title question. Section~\ref{sec:limitations} states the scope of
+the claim, and Section~\ref{sec:conclusion} concludes.
+
+\section{Related Work}
+\label{sec:related}
+
+\subsection{Channel and Spatial Attention Blocks}
+
+Squeeze-and-excitation~\cite{hu2018squeeze} introduced channel-only feature
+recalibration: global average pooling reduces a feature map to a per-channel
+descriptor, a two-layer bottleneck multilayer perceptron maps that descriptor
+to per-channel gates, a sigmoid bounds them, and the features are rescaled
+channel-wise. The design is cheap, architecture-agnostic, and has been widely
+adopted; subsequent work has refined the channel-gating mechanism itself, for
+example by replacing the bottleneck with a local cross-channel
+interaction~\cite{wang2020eca}.
+
+The bottleneck attention module~\cite{park2018bam} and the convolutional block
+attention module~\cite{woo2018cbam} extend this by adding a spatial branch. The
+former computes channel and spatial attention in parallel and fuses them; the
+latter applies channel attention and then spatial attention in sequence, and
+pools both average and maximum statistics in its channel gate. Both spatial
+branches derive their attention maps from local feature statistics rather than
+from a global descriptor, which is the property our hypothesis turns on. Broad
+surveys of attention in vision confirm the pattern across the
+family~\cite{guo2022attention}.
+
+What unites this cluster for our purposes is its evaluation protocol. The
+metrics reported are clean top-1 and top-5 classification accuracy, with mean
+average precision added where detection is evaluated. No member of this cluster
+reports a robustness or distribution-shift metric, so the relative ordering
+these papers establish has never been tested away from the clean distribution.
+
+\subsection{Corruption Robustness Benchmarking}
+
+A parallel literature evaluates classifiers under synthetic but realistic
+corruptions applied at graded severities~\cite{hendrycks2019benchmarking}. The
+protocol fixes a set of corruption types, applies each at five severity levels,
+and summarises degradation across the grid, which makes it possible to compare
+how fast models degrade rather than only where they start. Related work
+established that convolutional classifiers rely on cues that these corruptions
+disrupt~\cite{geirhos2019imagenet}, and that targeted augmentation can mitigate
+the damage~\cite{hendrycks2020augmix}.
+
+The corrupted benchmark used here shares the clean dataset's exact label space
+and resolution~\cite{krizhevsky2009learning}, so evaluating a trained model on
+it requires inference only: no retraining, no relabelling, and no architectural
+change. This is what makes the audit we perform cheap enough to be worth
+running, and makes its absence from the attention-block literature harder to
+explain.
+
+Characteristically, however, this literature deploys corruption benchmarks to
+\emph{validate a newly proposed intervention}. The benchmark is the evidence
+that a new method helps, rather than the instrument for auditing the ranking of
+methods that already exist.
+
+\subsection{Attention Mechanisms Under Distribution Shift}
+
+Recent work sits at the intersection of the two threads above. Attention-guided
+repair procedures improve the robustness of convolutional networks against
+common corruptions~\cite{ar2repair2025}, and channel attention has been
+combined with multi-scale push--pull inhibition to the same
+end~\cite{pushpull2025}. Both are validated on corruption benchmarks of the
+kind we use.
+
+Both, however, are proposals: each introduces a new mechanism and uses the
+corruption benchmark as evidence that the new mechanism works. Neither
+constitutes a head-to-head comparison of the already-published attention blocks
+under a single matched training protocol with a fixed insertion point. That
+controlled comparison, and the ranking-stability question it makes answerable,
+is the gap this paper fills.

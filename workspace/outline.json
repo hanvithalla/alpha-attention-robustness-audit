@@ -1,0 +1,307 @@
+{
+  "plotting_plan": [
+    {
+      "figure_id": "fig_shared_backbone_overview",
+      "title": "Shared Backbone with a Single Attention Insertion Point",
+      "plot_type": "diagram",
+      "data_source": "idea.md",
+      "objective": "Visual summary (Block Diagram) of the shared CIFAR-adapted ResNet-18 basic block, showing the attention module A applied to the residual branch after the second batch normalisation and before the residual addition, with the identity shortcut bypassing A, and the four interchangeable settings of A (none, SE, BAM, CBAM).",
+      "aspect_ratio": "16:9"
+    },
+    {
+      "figure_id": "fig_accuracy_vs_severity",
+      "title": "Accuracy Degradation Across Corruption Severity",
+      "plot_type": "plot",
+      "data_source": "experimental_log.md",
+      "objective": "Visual summary (Line Chart with Error Bars) plotting mean corruption accuracy against severity 0 through 5 for all four arms, with across-seed standard deviation as error bars, demonstrating whether the arms degrade at different rates and whether their lines cross.",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "figure_id": "fig_relative_robustness_drop",
+      "title": "Relative Robustness Drop by Arm",
+      "plot_type": "plot",
+      "data_source": "experimental_log.md",
+      "objective": "Visual summary (Bar Chart with Error Bars) of the relative robustness drop per arm with across-seed standard deviation, normalising out each arm's clean starting point so that an arm beginning lower is not misread as more robust.",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "figure_id": "fig_per_corruption_breakdown",
+      "title": "Per-Corruption-Type Accuracy Breakdown",
+      "plot_type": "plot",
+      "data_source": "experimental_log.md",
+      "objective": "Visual summary (Grouped Bar Chart) of mean accuracy per corruption type per arm, averaged over severities and seeds, exposing whether the four-type mean hides a type-specific skew that would flatter or punish spatial attention.",
+      "aspect_ratio": "16:9"
+    },
+    {
+      "figure_id": "fig_ranking_stability",
+      "title": "Ranking Stability from Clean to Severity Five",
+      "plot_type": "plot",
+      "data_source": "experimental_log.md",
+      "objective": "Visual summary (Bump/Slope Chart) of each arm's rank position at clean and at each corruption severity, so that any reordering between the clean ranking and a corrupted ranking is directly readable as a crossing line.",
+      "aspect_ratio": "4:3"
+    }
+  ],
+  "intro_related_work_plan": {
+    "introduction_strategy": {
+      "hook_hypothesis": "Channel and spatial attention blocks are among the cheapest and most widely reused architectural additions in computer vision, and practitioners select among them on the clean-accuracy numbers their original papers report.",
+      "problem_gap_hypothesis": "Those numbers are collected under conditions a deployed classifier never reproduces, and no paper in this method family reports whether the ordering they induce survives common image corruptions, even though a corruption benchmark sharing the same label space and resolution is freely available and requires inference only.",
+      "search_directions": [
+        "Find highly cited foundational papers establishing channel and spatial attention as standard CNN components and the accuracy gains they report",
+        "Search for published surveys of attention mechanisms in convolutional neural networks that summarise the evaluation metrics used across the family",
+        "Identify foundational papers establishing corruption robustness benchmarking as a standard evaluation axis for image classifiers",
+        "Find highly cited work documenting the real-world impact of distribution shift and common corruptions on deployed vision models",
+        "Identify papers arguing that single-metric benchmark rankings can be misleading or fail to transfer to deployment conditions"
+      ]
+    },
+    "related_work_strategy": {
+      "overview": "Investigate three paradigms to establish that the compared attention blocks are evaluated on clean accuracy alone, that corruption robustness is an established and orthogonal evaluation axis, and that no existing work audits this specific method family under one matched training protocol.",
+      "subsections": [
+        {
+          "subsection_title": "2.1 Channel and Spatial Attention Blocks",
+          "methodology_cluster": "Feature recalibration modules for CNNs",
+          "sota_investigation_mission": "Identify the canonical channel-attention and channel-plus-spatial-attention blocks, the backbones they were validated in, and the exact set of metrics each reports.",
+          "limitation_hypothesis": "Every paper in this cluster reports clean top-1 and top-5 accuracy, and detection mAP where applicable, but none reports any robustness or distribution-shift metric, so the ordering these papers induce has never been tested off the clean distribution.",
+          "limitation_search_queries": [
+            "squeeze and excitation channel attention reported evaluation metrics top-1 accuracy",
+            "convolutional block attention module spatial attention evaluation protocol",
+            "bottleneck attention module dilated convolution spatial gate evaluation",
+            "attention module CNN comparison clean accuracy only no robustness evaluation"
+          ],
+          "bridge_to_our_method": "We take these blocks exactly as published, place them at one identical insertion point in one shared backbone, and re-rank them on a metric none of them reports."
+        },
+        {
+          "subsection_title": "2.2 Corruption Robustness Benchmarking",
+          "methodology_cluster": "Common-corruption benchmarks and robustness metrics",
+          "sota_investigation_mission": "Establish the standard protocol for evaluating classifiers under common corruptions, including corruption types, severity levels, and the aggregate metrics used to summarise degradation.",
+          "limitation_hypothesis": "This literature is overwhelmingly used to validate newly proposed robustness interventions rather than to audit the ranking of an existing family of architectural components, so a large body of widely reused modules has never been placed on this axis.",
+          "limitation_search_queries": [
+            "benchmarking neural network robustness to common corruptions and perturbations protocol",
+            "CIFAR-10-C corruption severity levels mean corruption error metric",
+            "corruption robustness relative degradation metric normalising clean accuracy",
+            "distribution shift evaluation image classification deployment"
+          ],
+          "bridge_to_our_method": "We adopt this literature's severity-stratified protocol and its degradation framing, but apply it as an audit of existing published components rather than as validation of a new method."
+        },
+        {
+          "subsection_title": "2.3 Attention Mechanisms Under Distribution Shift",
+          "methodology_cluster": "Robustness-oriented attention and repair methods",
+          "sota_investigation_mission": "Identify recent work that combines attention mechanisms with corruption robustness, and determine in each case whether the contribution is a new proposed method or a controlled comparison of existing ones.",
+          "limitation_hypothesis": "Existing work at this intersection proposes new attention variants or repair procedures and uses corruption benchmarks to validate them; none performs a head-to-head, matched-budget comparison of the already-published blocks under a single shared backbone and insertion point.",
+          "limitation_search_queries": [
+            "attention guided repair robustness convolutional networks common corruptions",
+            "channel attention corruption robustness push-pull inhibition",
+            "attention mechanism robustness distribution shift comparison study",
+            "matched training protocol controlled comparison architectural components"
+          ],
+          "bridge_to_our_method": "Our contribution is the controlled comparison this cluster does not perform: identical backbone, identical insertion point, identical budget, identical seeds, with only the module varying."
+        }
+      ]
+    }
+  },
+  "section_plan": [
+    {
+      "section_title": "1. Introduction",
+      "subsections": [],
+      "content_bullets": [
+        "Open with the Problem Statement from idea.md: attention blocks are compared almost exclusively on clean test accuracy, and one of them positions itself as an improvement over another on precisely that basis.",
+        "State the deployment mismatch: sensors blur, illumination drifts, contrast collapses, and the practitioner's selection metric was collected under conditions the deployment does not reproduce.",
+        "Sharpen the question from 'do attention blocks help' to 'is the ordering they induce on clean data the ordering that survives corruption'.",
+        "Name the two confounds from idea.md that prevent the existing literature from answering: per-paper backbones and budgets, and the shared repository and insertion convention that two of the three blocks inherit while the third does not.",
+        "State the Core Hypothesis from idea.md: spatial attention maps depend on local structure that defocus blur and contrast reduction attack directly, so a spatial gate may degrade faster than a channel-only gate.",
+        "Pre-commit to the null being equally reportable, exactly as idea.md frames it, so the reader knows the outcome was not selected after the fact.",
+        "List the four Expected Contributions from idea.md as a bulleted list: the matched-budget single-backbone comparison, the ranking-stability result, the provenance record including the BAM paper-versus-code fusion discrepancy, and the practical selection guidance.",
+        "Close with a roadmap of the remaining sections."
+      ],
+      "citation_hints": [
+        "research paper introducing Squeeze-and-Excitation Networks",
+        "research paper introducing the Convolutional Block Attention Module",
+        "research paper introducing the Bottleneck Attention Module",
+        "research paper introducing benchmarking of neural network robustness to common corruptions and perturbations",
+        "research paper introducing deep residual learning for image recognition",
+        "technical report introducing the CIFAR-10 dataset"
+      ]
+    },
+    {
+      "section_title": "2. Related Work",
+      "subsections": [
+        {
+          "subsection_title": "2.1 Channel and Spatial Attention Blocks",
+          "content_bullets": [
+            "Describe channel-only recalibration: global average pooling to a channel descriptor, a two-layer bottleneck MLP, a sigmoid gate, and a channel-wise rescale, as formalised in the Proposed Methodology of idea.md.",
+            "Describe the parallel channel-plus-spatial design and the sequential channel-then-spatial design, and note that the spatial branches compute attention from local feature statistics rather than from a global descriptor.",
+            "State explicitly that the metrics reported across this cluster are clean top-1 and top-5 accuracy, plus detection mAP where applicable, and that no robustness metric appears."
+          ],
+          "citation_hints": [
+            "research paper introducing Squeeze-and-Excitation Networks",
+            "research paper introducing the Bottleneck Attention Module",
+            "research paper introducing the Convolutional Block Attention Module",
+            "survey paper on attention mechanisms in convolutional neural networks"
+          ]
+        },
+        {
+          "subsection_title": "2.2 Corruption Robustness Benchmarking",
+          "content_bullets": [
+            "Introduce the severity-stratified common-corruption protocol and the practice of reporting accuracy across corruption types and severities.",
+            "Note that the corruption benchmark used here shares the exact label space and resolution of the clean training set, so corrupted evaluation is inference only, with no retraining and no relabelling, as stated in the Setup subsection of experimental_log.md.",
+            "Observe that this literature is typically used to validate a newly proposed intervention rather than to audit an existing family of components."
+          ],
+          "citation_hints": [
+            "research paper introducing benchmarking of neural network robustness to common corruptions and perturbations",
+            "research paper on evaluating image classifier robustness under distribution shift"
+          ]
+        },
+        {
+          "subsection_title": "2.3 Attention Mechanisms Under Distribution Shift",
+          "content_bullets": [
+            "Summarise recent work combining attention with corruption robustness, and characterise each as proposing a new method validated on a corruption benchmark.",
+            "State the gap precisely: none of this work is a head-to-head audit of the existing blocks under one matched training protocol with a fixed insertion point, which is what this paper contributes."
+          ],
+          "citation_hints": [
+            "research paper on attention-guided repair for robustness of CNNs against common corruptions",
+            "research paper on channel attention with push-pull inhibition for corruption robustness"
+          ]
+        }
+      ]
+    },
+    {
+      "section_title": "3. Method",
+      "subsections": [
+        {
+          "subsection_title": "3.1 Shared Backbone and a Single Insertion Point",
+          "content_bullets": [
+            "Formalise the backbone from the Proposed Methodology of idea.md: a CIFAR-adapted ResNet-18 with a 3x3 stride-1 stem and no initial max-pool, four stages of two basic blocks at widths 64, 128, 256 and 512, global average pooling, and a linear classifier, grounded in model.py under experiments/attention-robustness/code/.",
+            "State the residual-branch equation from idea.md, out = relu(A(BN2(conv2(relu(BN1(conv1(x)))))) + shortcut(x)), and define A as the attention module under test or the identity for the baseline arm.",
+            "Argue the confound control: because A is the only varying term, a measured difference is attributable to the module rather than to placement, host architecture, or training recipe.",
+            "State the cost of this choice honestly, as the Decisions subsection of experimental_log.md records: no arm reproduces its own paper's placement, so absolute accuracies are not comparable to published numbers and none is claimed.",
+            "Report the parameter counts from experimental_log.md: none 11.17M, SE 11.26M, BAM 11.36M, CBAM 11.26M, showing the arms differ only by attention parameters."
+          ],
+          "citation_hints": [
+            "research paper introducing deep residual learning for image recognition",
+            "research paper introducing batch normalization"
+          ]
+        },
+        {
+          "subsection_title": "3.2 Attention Modules and Their Provenance",
+          "content_bullets": [
+            "Give the channel-only formulation from idea.md: global average pool to z, then s equals sigma of W2 delta W1 z with W1 in R to the C over r by C, then channel-wise rescale, with r equal to 16.",
+            "State that this is the study's single reimplementation and justify it from the Decisions subsection of experimental_log.md: the official release of that method is Caffe-only and contains no Python, while the block itself is fully specified by two equations.",
+            "State that the other two modules are ported directly from the official public implementation, preserving layer types, pooling choices, bias settings, batch-norm placement and hyperparameters, and bottleneck widths C over r.",
+            "Emphasise the first load-bearing detail from idea.md: the two spatial-attention arms use different channel gates, one pooling average statistics only with normalisation between its MLP layers and the other pooling average and max through a shared MLP, and conflating them would partially collapse the contrast the study measures.",
+            "Report the second load-bearing detail: the published fusion equation of one module is additive while its official code computes a multiplicative fusion with a residual offset; we follow the code because the code is the artefact the field reuses, and we report the discrepancy rather than resolving it silently."
+          ],
+          "citation_hints": [
+            "research paper introducing Squeeze-and-Excitation Networks",
+            "research paper introducing the Bottleneck Attention Module",
+            "research paper introducing the Convolutional Block Attention Module"
+          ]
+        },
+        {
+          "subsection_title": "3.3 Mechanical Verification of Module Fidelity",
+          "content_bullets": [
+            "Explain why fidelity is asserted mechanically rather than by inspection: the comparison's validity rests entirely on the modules being what they claim to be, as the Orchestration Decisions of experimental_log.md record.",
+            "Describe the structural assertions and, critically, the behavioural ones from idea.md: one module's output-to-input ratio must lie in the open interval from 1 to 2 as its residual multiplicative form requires, and the other's in the open interval from 0 to 1 as a pure gate requires, so fusion semantics are verified by behaviour rather than by reading source code.",
+            "Note that the suite runs before every training installment, grounded in verify_milestones.py under experiments/attention-robustness/code/."
+          ],
+          "citation_hints": []
+        }
+      ]
+    },
+    {
+      "section_title": "4. Experimental Setup",
+      "subsections": [
+        {
+          "subsection_title": "4.1 Data and Training Protocol",
+          "content_bullets": [
+            "State the datasets from the Setup subsection of experimental_log.md: 50,000 training and 10,000 test images at 32x32 across 10 classes for training and clean evaluation, and the corruption benchmark restricted to four corruption types at severities 1 through 5 with 10,000 images per type and severity.",
+            "State the matched training recipe verbatim from the Setup subsection: SGD, learning rate 0.1, momentum 0.9, weight decay 5e-4, batch size 128, cosine annealing, random 32x32 crop with 4-pixel padding and random horizontal flip, identical across all arms.",
+            "State the seed set and the resulting number of training runs, and that no arm uses a pretrained or externally obtained checkpoint.",
+            "State the precision policy from the Setup subsection: mixed precision for training and full precision for validation, so that checkpoint selection and final evaluation share one numeric path.",
+            "State the hardware from the Setup subsection."
+          ],
+          "citation_hints": [
+            "technical report introducing the CIFAR-10 dataset",
+            "research paper introducing stochastic gradient descent with momentum for deep networks",
+            "research paper introducing cosine annealing learning rate schedules",
+            "research paper introducing mixed precision training"
+          ]
+        },
+        {
+          "subsection_title": "4.2 Metrics",
+          "content_bullets": [
+            "Define clean top-1 accuracy as the metric the field currently ranks on and the severity-zero reference point.",
+            "Define mean corruption accuracy at each severity, averaged over corruption types.",
+            "Define the relative robustness drop as clean minus corrupted over clean, and justify it from idea.md: it normalises out each arm's clean starting point so an arm beginning lower is not mistaken for a robust one merely because it had less accuracy to lose.",
+            "State that all results are averaged over seeds and reported with across-seed standard deviation, and that the analysis checks whether the gap between the top two arms exceeds seed noise before any ranking claim is made."
+          ],
+          "citation_hints": [
+            "research paper introducing benchmarking of neural network robustness to common corruptions and perturbations"
+          ]
+        }
+      ]
+    },
+    {
+      "section_title": "5. Results and Analysis",
+      "subsections": [
+        {
+          "subsection_title": "5.1 Clean Accuracy",
+          "content_bullets": [
+            "Report the clean top-1 accuracy per arm with across-seed standard deviation from the Results block of experimental_log.md, in a booktabs table.",
+            "State the clean ranking and immediately compare the gap between the top two arms against the largest across-seed standard deviation, as the Results block records, so the reader learns whether the ranking is resolved before being shown any ordering."
+          ],
+          "citation_hints": []
+        },
+        {
+          "subsection_title": "5.2 Degradation Across Corruption Severity",
+          "content_bullets": [
+            "Report mean corruption accuracy by severity for every arm from the Results block, in a booktabs table with mCA and relative robustness drop as final columns.",
+            "Pair the table with the accuracy-versus-severity figure and describe whether the arms' curves converge, diverge, or cross.",
+            "Report the relative robustness drop per arm and pair it with its bar figure, noting whether the drop ordering differs from the absolute-accuracy ordering."
+          ],
+          "citation_hints": []
+        },
+        {
+          "subsection_title": "5.3 Does the Clean Ranking Survive?",
+          "content_bullets": [
+            "State the ranking at clean and at each severity from the Results block, and state directly whether any reordering occurs, pairing with the ranking-stability figure.",
+            "Answer the paper's title question in one explicit sentence.",
+            "If the arms are separated by less than seed noise, say so plainly and scope the conclusion to 'unresolved at this budget' rather than reporting an ordering the data does not support."
+          ],
+          "citation_hints": []
+        },
+        {
+          "subsection_title": "5.4 Per-Corruption-Type Breakdown",
+          "content_bullets": [
+            "Report mean accuracy per corruption type per arm from the Results block, paired with the per-corruption breakdown figure.",
+            "Use the breakdown to test whether the four-type mean hides a type-specific skew, since the Notes and Limitations subsection of experimental_log.md flags exactly this risk."
+          ],
+          "citation_hints": []
+        }
+      ]
+    },
+    {
+      "section_title": "6. Limitations",
+      "subsections": [],
+      "content_bullets": [
+        "State, from the Notes and Limitations subsection of experimental_log.md, that only three attention methods plus one baseline were compared, so the design supports per-severity descriptive statements and not a general claim that attention type predicts corruption robustness.",
+        "State that only four of the benchmark's corruption types were used, that averaging over them could flatter or punish spatial attention, and that the per-type breakdown is therefore reported alongside the mean, with the finding scoped to those types and extension being inference-only.",
+        "State that the training budget is matched across arms, which is what the ranking claim requires, but short, and that longer training could change absolute accuracies and in principle the ordering.",
+        "State that holding the insertion point fixed means no arm reproduces its own paper's placement, so absolute accuracies are not comparable to published results and none is claimed.",
+        "State that a single dataset at a single resolution was used.",
+        "If the Results block records that the clean gap between the top two arms is smaller than the largest across-seed standard deviation, state that the ranking is unresolved at this budget rather than measured."
+      ],
+      "citation_hints": []
+    },
+    {
+      "section_title": "7. Conclusion",
+      "subsections": [],
+      "content_bullets": [
+        "Restate what was held fixed and what varied, and the single question the design answers.",
+        "State the answer obtained, whichever it is, without softening a null into an implied positive.",
+        "State the practical consequence for someone selecting among these blocks for a deployed classifier.",
+        "Note the provenance contribution, including the discrepancy between one module's published fusion equation and the fusion its official code computes.",
+        "Point to the cheapest extension the Notes and Limitations subsection identifies: the remaining corruption types are ungated and require inference only, with no retraining."
+      ],
+      "citation_hints": []
+    }
+  ]
+}
