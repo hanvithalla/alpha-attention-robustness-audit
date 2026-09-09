@@ -1,0 +1,40 @@
+{
+  "experiment": "attention-robustness",
+  "status": "running",
+  "config": {
+    "backbone": "ResNet-18 (CIFAR variant: 3x3 stride-1 stem, no max-pool)",
+    "widths": [
+      64,
+      128,
+      256,
+      512
+    ],
+    "blocks_per_stage": 2,
+    "attention_insertion": "residual branch, after bn2, before residual add",
+    "reduction_ratio": 16,
+    "optimizer": "SGD",
+    "lr": 0.1,
+    "momentum": 0.9,
+    "weight_decay": 0.0005,
+    "batch_size": 128,
+    "scheduler": "CosineAnnealingLR",
+    "epochs": 10,
+    "seeds": [
+      1,
+      2,
+      3
+    ],
+    "augmentation": "RandomCrop(32, padding=4) + RandomHorizontalFlip",
+    "precision": "AMP for training, fp32 for validation",
+    "hardware": "NVIDIA RTX A2000 6GB, PyTorch 2.5.1+cu121"
+  },
+  "params_millions": {
+    "none": 11.17,
+    "SE": 11.26,
+    "BAM": 11.36,
+    "CBAM": 11.26
+  },
+  "metrics": {
+    "status": "PENDING"
+  }
+}

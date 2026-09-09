@@ -1,0 +1,138 @@
+\documentclass[10pt]{article}
+
+% ── Core packages ─────────────────────────────────────────────────────────────
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+
+% ── Page geometry (NeurIPS/ICML style: 6.5in × 9in text block) ───────────────
+\usepackage[
+  top=1in, bottom=1in,
+  left=0.75in, right=0.75in,
+  columnsep=0.25in
+]{geometry}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{4pt}
+
+% ── Mathematics ───────────────────────────────────────────────────────────────
+\usepackage{amsmath,amssymb,amsthm}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{proposition}{Proposition}
+\newtheorem{definition}{Definition}
+\newtheorem{corollary}{Corollary}
+
+% ── Algorithms ────────────────────────────────────────────────────────────────
+\usepackage[ruled,vlined]{algorithm2e}
+
+% ── Figures and tables ────────────────────────────────────────────────────────
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{subcaption}
+
+% ── Hyperlinks and references ─────────────────────────────────────────────────
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\usepackage{natbib}
+
+% ── Code listings ─────────────────────────────────────────────────────────────
+\usepackage{listings}
+\lstset{basicstyle=\small\ttfamily, breaklines=true, frame=single}
+
+% ── Utilities ─────────────────────────────────────────────────────────────────
+\usepackage{xcolor}
+\usepackage{url}
+\usepackage{enumitem}
+
+% ─────────────────────────────────────────────────────────────────────────────
+
+\begin{document}
+
+% Title block
+\title{[PAPER TITLE]}
+\author{Anonymous Submission}
+\date{}
+\maketitle
+
+\begin{abstract}
+[ABSTRACT — 150–250 words summarising the problem, approach, key results,
+and significance. Written last, after the rest of the paper is complete.]
+\end{abstract}
+
+% ── 1. Introduction ───────────────────────────────────────────────────────────
+\section{Introduction}
+\label{sec:introduction}
+
+[Motivate the problem. State the research gap. Summarise contributions in a
+bulleted list. End with a roadmap of the remaining sections.]
+
+% ── 2. Related Work ───────────────────────────────────────────────────────────
+\section{Related Work}
+\label{sec:related}
+
+[Cover the three nearest related threads: prior methods, concurrent work,
+datasets used. Cite all works mentioned in \texttt{idea.md}.]
+
+% ── 3. Method ─────────────────────────────────────────────────────────────────
+\section{Method}
+\label{sec:method}
+
+[Formal problem statement, then the proposed approach. Include one or more
+pseudocode blocks (Algorithm environment) for the core procedure. Derive
+any theoretical claims as numbered Propositions or Theorems.]
+
+% ── 4. Experiments ────────────────────────────────────────────────────────────
+\section{Experiments}
+\label{sec:experiments}
+
+\subsection{Experimental Setup}
+[Datasets, baselines, metrics, hyperparameters, hardware. Pull from
+\texttt{experimental\_log.md}.]
+
+\subsection{Main Results}
+[Primary metric table comparing proposed method vs baselines. Reference
+figures from the \texttt{figures/} directory.]
+
+\begin{table}[t]
+\centering
+\caption{Main results on [dataset].}
+\label{tab:main}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Method} & \textbf{Metric 1} & \textbf{Metric 2} \\
+\midrule
+Baseline A & -- & -- \\
+Baseline B & -- & -- \\
+\textbf{Ours} & \textbf{--} & \textbf{--} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Ablations}
+[Remove one component at a time. Each row in the ablation table corresponds to
+one disabled component.]
+
+\subsection{Analysis}
+[Qualitative analysis, failure cases, limitations.]
+
+% ── 5. Discussion ─────────────────────────────────────────────────────────────
+\section{Discussion}
+\label{sec:discussion}
+
+[Broader implications. Connections to related fields. What this work enables.]
+
+% ── 6. Conclusion ─────────────────────────────────────────────────────────────
+\section{Conclusion}
+\label{sec:conclusion}
+
+[One-paragraph summary. Repeat the three key takeaways from the abstract.
+Future work directions.]
+
+% ── References ────────────────────────────────────────────────────────────────
+\bibliographystyle{plainnat}
+\bibliography{refs}
+
+\end{document}
