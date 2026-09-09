@@ -21,24 +21,36 @@ N_SEVERITIES = 5
 
 
 def load_corruption(corruption, severity, cache_dir="./data/CIFAR-10-C"):
-    """Return (images uint8 (N,32,32,3), labels int64 (N,)) for one severity."""
+    """Return (images uint8 (N,32,32,3), labels int64 (N,)) for one severity.
+
+    Cached as uncompressed .npy and memory-mapped: the evaluation sweep reads
+    every split once per model, so a compressed .npz would decompress 30 MB
+    twelve times per split. Mapped pages are shared and effectively free after
+    the first read. An existing .npz cache is migrated in place.
+    """
     from pathlib import Path
 
     cache = Path(cache_dir)
     cache.mkdir(parents=True, exist_ok=True)
+    img_path = cache / f"{corruption}_s{severity}_images.npy"
+    lbl_path = cache / f"{corruption}_s{severity}_labels.npy"
     npz_path = cache / f"{corruption}_s{severity}.npz"
 
-    if npz_path.exists():
-        with np.load(npz_path) as d:
-            return d["images"], d["labels"]
+    if not img_path.exists():
+        if npz_path.exists():
+            with np.load(npz_path) as d:
+                images, labels = d["images"], d["labels"]
+        else:
+            from datasets import load_dataset
 
-    from datasets import load_dataset
+            ds = load_dataset(HF_REPO, corruption, split=f"severity_{severity}")
+            images = np.stack([np.asarray(r.convert("RGB"), dtype=np.uint8)
+                               for r in ds["image"]])
+            labels = np.asarray(ds["label"], dtype=np.int64)
+        np.save(img_path, images)
+        np.save(lbl_path, labels)
 
-    ds = load_dataset(HF_REPO, corruption, split=f"severity_{severity}")
-    images = np.stack([np.asarray(r.convert("RGB"), dtype=np.uint8) for r in ds["image"]])
-    labels = np.asarray(ds["label"], dtype=np.int64)
-    np.savez_compressed(npz_path, images=images, labels=labels)
-    return images, labels
+    return np.load(img_path, mmap_mode="r"), np.load(lbl_path, mmap_mode="r")
 
 
 def prefetch(corruptions, cache_dir="./data/CIFAR-10-C"):

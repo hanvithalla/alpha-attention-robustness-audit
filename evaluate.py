@@ -32,7 +32,9 @@ MODEL_CHOICES = {"none": None, "SE": "SE", "BAM": "BAM", "CBAM": "CBAM"}
 
 
 def to_normalized_tensor(images_uint8, device):
-    x = torch.from_numpy(images_uint8).float().permute(0, 3, 1, 2) / 255.0
+    # np.ascontiguousarray materialises the slice: the corruption cache is
+    # memory-mapped and read-only, which torch.from_numpy will not accept.
+    x = torch.from_numpy(np.ascontiguousarray(images_uint8)).float().permute(0, 3, 1, 2) / 255.0
     mean = torch.tensor(CIFAR_MEAN, device=x.device).view(1, 3, 1, 1)
     std = torch.tensor(CIFAR_STD, device=x.device).view(1, 3, 1, 1)
     return ((x - mean) / std).to(device)
@@ -44,7 +46,7 @@ def eval_numpy_batches(model, images, labels, device, batch_size):
     correct, n = 0, images.shape[0]
     for i in range(0, n, batch_size):
         x = to_normalized_tensor(images[i:i + batch_size], device)
-        y = torch.from_numpy(labels[i:i + batch_size]).long().to(device)
+        y = torch.from_numpy(np.ascontiguousarray(labels[i:i + batch_size])).long().to(device)
         correct += (model(x).argmax(dim=1) == y).sum().item()
     return 100.0 * correct / n
 
