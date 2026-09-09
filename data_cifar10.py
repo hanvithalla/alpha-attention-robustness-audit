@@ -17,23 +17,38 @@ from torch.utils.data import Dataset
 HF_REPO = "uoft-cs/cifar10"
 
 
-def _load_split(split, cache_dir):
+def _load_split(split, cache_dir, mmap=True):
+    """Return (images, labels) for one split.
+
+    Cached as uncompressed .npy and opened with mmap_mode='r' so that every
+    dataloader worker shares one set of OS page-cache pages instead of holding
+    its own 150 MB copy. On Windows each worker is a fresh process that
+    re-imports torch, so worker memory is the binding constraint on this
+    machine; a compressed .npz cannot be mapped and forces a per-worker copy.
+    """
     cache = Path(cache_dir)
     cache.mkdir(parents=True, exist_ok=True)
+    img_path = cache / f"cifar10_{split}_images.npy"
+    lbl_path = cache / f"cifar10_{split}_labels.npy"
     npz_path = cache / f"cifar10_{split}.npz"
 
-    if npz_path.exists():
-        with np.load(npz_path) as d:
-            return d["images"], d["labels"]
+    if not img_path.exists():
+        if npz_path.exists():  # migrate the earlier compressed cache in place
+            with np.load(npz_path) as d:
+                images, labels = d["images"], d["labels"]
+        else:
+            from datasets import load_dataset
 
-    from datasets import load_dataset
+            ds = load_dataset(HF_REPO, split=split)
+            img_key = "img" if "img" in ds.column_names else "image"
+            images = np.stack([np.asarray(r.convert("RGB"), dtype=np.uint8)
+                               for r in ds[img_key]])
+            labels = np.asarray(ds["label"], dtype=np.int64)
+        np.save(img_path, images)
+        np.save(lbl_path, labels)
 
-    ds = load_dataset(HF_REPO, split=split)
-    img_key = "img" if "img" in ds.column_names else "image"
-    images = np.stack([np.asarray(r.convert("RGB"), dtype=np.uint8) for r in ds[img_key]])
-    labels = np.asarray(ds["label"], dtype=np.int64)
-    np.savez_compressed(npz_path, images=images, labels=labels)
-    return images, labels
+    mode = "r" if mmap else None
+    return np.load(img_path, mmap_mode=mode), np.load(lbl_path, mmap_mode=mode)
 
 
 class CIFAR10Numpy(Dataset):
