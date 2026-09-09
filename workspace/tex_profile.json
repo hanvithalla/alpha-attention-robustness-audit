@@ -1,6 +1,5 @@
 {
-  "available": [],
-  "missing": [
+  "available": [
     "cleveref",
     "nicefrac",
     "microtype",
@@ -9,14 +8,21 @@
     "natbib",
     "hyperref",
     "fontenc",
-    "times",
-    "lmodern"
+    "lmodern",
+    "graphicx",
+    "amsmath",
+    "amssymb"
   ],
-  "use_cleveref": false,
-  "use_nicefrac": false,
-  "use_microtype": false,
-  "use_t1_fontenc": false,
-  "tex_binary": null,
-  "error": "pdflatex not found in PATH or known locations",
-  "checked_at": "2026-09-09T08:34:01.378291"
+  "missing": [
+    "times"
+  ],
+  "use_cleveref": true,
+  "use_nicefrac": true,
+  "use_microtype": true,
+  "use_t1_fontenc": true,
+  "tex_binary": "C:/Users/RCC/bin/tectonic.exe",
+  "engine": "tectonic 0.17.0 (XeTeX)",
+  "note": "check_tex_packages.py probes only for pdflatex and wrote a fallback profile marking every package missing. This machine has no pdflatex; it has tectonic, which resolves packages on demand from its bundle. The list above was verified empirically by compiling a document that loads all of them together -- it produced a PDF. 'times' is omitted deliberately: lmodern is loaded instead, matching the template.",
+  "verified_by": "compile probe, E:/Temp/texprobe/p.tex -> p.pdf",
+  "checked_at": "2026-09-09T14:26:00"
 }
