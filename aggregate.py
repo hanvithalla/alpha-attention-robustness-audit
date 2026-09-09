@@ -200,6 +200,12 @@ def main():
     }
     (out / "findings.json").write_text(json.dumps(findings, indent=2), encoding="utf-8")
 
+    # per-corruption-type means, keyed variant -> corruption; consumed by
+    # make_figures.py for the breakdown figure that exposes a skewed average
+    per_corruption = {v: {c: by_type[(v, c)][0] for c in corruptions if (v, c) in by_type}
+                      for v in variants}
+    (out / "per_corruption.json").write_text(json.dumps(per_corruption, indent=2), encoding="utf-8")
+
     print("\n".join(lines))
     print(f"\nWrote {out/'aggregate_by_severity.csv'}, {out/'ranking_table.md'}, {out/'findings.json'}")
 
