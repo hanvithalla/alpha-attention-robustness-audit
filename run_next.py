@@ -14,6 +14,8 @@ Usage (run the same command every session):
 """
 
 import argparse
+import gc
+import json
 import subprocess
 import sys
 from pathlib import Path
@@ -24,12 +26,33 @@ VARIANTS = ["none", "SE", "BAM", "CBAM"]
 
 
 def completed_epochs(out_dir, variant, seed):
+    """Epochs finished for one cell.
+
+    Reads the progress sidecar written by train.py. Falls back to the full
+    checkpoint only for runs predating the sidecar, and frees it immediately:
+    each state file carries model + optimizer + scheduler + RNG state at
+    ~135 MB, and torch.load-ing all 12 cells per invocation was enough memory
+    churn to get this process killed by the OS.
+    """
     run_name = f"resnet18_{variant.lower()}_seed{seed}"
-    state_path = Path(out_dir) / f"{run_name}_state.pth"
+    out = Path(out_dir)
+
+    progress_path = out / f"{run_name}_progress.json"
+    if progress_path.exists():
+        try:
+            with open(progress_path) as f:
+                return int(json.load(f)["epoch"])
+        except (ValueError, KeyError, OSError):
+            pass  # corrupt sidecar: fall through to the checkpoint
+
+    state_path = out / f"{run_name}_state.pth"
     if not state_path.exists():
         return 0
     state = torch.load(state_path, map_location="cpu", weights_only=False)
-    return state["epoch"]
+    epoch = int(state["epoch"])
+    del state
+    gc.collect()
+    return epoch
 
 
 def print_grid(progress, variants, seeds, target):

@@ -273,6 +273,11 @@ def main():
             state_path,
         )
 
+        # Tiny sidecar so the driver can read progress without torch.load-ing a
+        # ~135 MB checkpoint per cell just to get an integer.
+        with open(out_dir / f"{run_name}_progress.json", "w") as f:
+            json.dump({"epoch": epoch, "best_acc": best_acc, "epochs": args.epochs}, f)
+
         if args.time_limit_min is not None and (time.time() - installment_start) / 60.0 >= args.time_limit_min:
             remaining = args.epochs - epoch
             print(f"[{run_name}] time limit reached after epoch {epoch}. {remaining} epoch(s) remaining -- rerun the same command to continue.")
