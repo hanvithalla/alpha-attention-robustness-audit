@@ -17,11 +17,6 @@
 
 % ── Mathematics ───────────────────────────────────────────────────────────────
 \usepackage{amsmath,amssymb,amsthm}
-\newtheorem{theorem}{Theorem}
-\newtheorem{lemma}{Lemma}
-\newtheorem{proposition}{Proposition}
-\newtheorem{definition}{Definition}
-\newtheorem{corollary}{Corollary}
 
 % ── Figures and tables ────────────────────────────────────────────────────────
 \usepackage{graphicx}
@@ -266,7 +261,7 @@ $11.26$M for SE, $11.36$M for BAM, and $11.26$M for CBAM.
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=0.86\linewidth]{figures/fig_shared_backbone_overview.png}
+  \includegraphics[width=0.74\linewidth]{figures/fig_shared_backbone_overview.png}
   \caption{The shared residual block and its single attention slot. Every arm
   uses this identical block; only the module $A$ changes, and the identity
   shortcut never passes through it. Holding the insertion point fixed is what
@@ -405,7 +400,7 @@ drop. Figure~\ref{fig:severity} plots the same data.
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=0.62\linewidth]{figures/fig_accuracy_vs_severity.png}
+  \includegraphics[width=0.50\linewidth]{figures/fig_accuracy_vs_severity.png}
   \caption{Top-1 accuracy against corruption severity, averaged over four
   corruption types and three seeds, with across-seed standard deviation as error
   bars. The curves do not cross at any severity: the ordering established on
@@ -467,7 +462,7 @@ quietly restating it.
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=0.58\linewidth]{figures/fig_ranking_stability.png}
+  \includegraphics[width=0.46\linewidth]{figures/fig_ranking_stability.png}
   \caption{Rank position of each arm at clean and at each corruption severity. A
   reordering would appear as crossing lines; none occurs, which is the paper's
   central negative result in its most direct form.}
@@ -502,7 +497,7 @@ observation rather than a claim.
 \subsection{Per-Corruption Breakdown}
 
 Averaging four corruption types can hide a type-specific skew, so
-Table~\ref{tab:percorr} and Figure~\ref{fig:percorr} report the breakdown.
+Table~\ref{tab:percorr} reports the breakdown.
 
 \begin{table}[t]
   \centering
@@ -522,16 +517,6 @@ Table~\ref{tab:percorr} and Figure~\ref{fig:percorr} report the breakdown.
   \end{tabular}
 \end{table}
 
-\begin{figure}[t]
-  \centering
-  \includegraphics[width=0.86\linewidth]{figures/fig_per_corruption_breakdown.png}
-  \caption{Mean accuracy per corruption type, averaged over severities 1--5 and
-  three seeds. Reporting the breakdown alongside the four-type mean makes a
-  type-specific skew visible: contrast is the most damaging corruption for every
-  arm, and also where the attention arms separate most from the baseline.}
-  \label{fig:percorr}
-\end{figure}
-
 The ordering is identical within every corruption type, so the aggregate is not
 concealing a reversal. Contrast is by far the most damaging corruption, costing
 the baseline $26$ pp relative to brightness, and it is also where the attention
@@ -545,19 +530,8 @@ as a hypothesis for future work rather than a finding.
 \label{sec:bam}
 
 BAM finishes last on every metric, $4.5$ pp below the baseline on clean accuracy
-and $4.4$ pp below on mCA, with the widest across-seed spread of any arm.
-Figure~\ref{fig:drop} shows it also has the largest relative degradation.
-
-\begin{figure}[t]
-  \centering
-  \includegraphics[width=0.55\linewidth]{figures/fig_relative_robustness_drop.png}
-  \caption{Relative robustness drop, $(\text{clean}-\text{corrupted})/\text{clean}$,
-  per arm with across-seed standard deviation. Normalising by each arm's own
-  clean accuracy prevents an arm that starts lower from appearing robust merely
-  because it had less accuracy to lose; the ordering is unchanged from the
-  absolute measure.}
-  \label{fig:drop}
-\end{figure}
+and $4.4$ pp below on mCA, with the widest across-seed spread of any arm, and the largest relative
+degradation of the four (Table~\ref{tab:main}).
 
 We are deliberately cautious about what this means. At a 10-epoch budget, an arm
 that converges more slowly is indistinguishable from an arm that converges to a

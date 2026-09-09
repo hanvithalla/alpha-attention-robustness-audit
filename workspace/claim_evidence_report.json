@@ -39,31 +39,31 @@
     {
       "claim": "94}${\\scriptsize$\\pm0.67$} & $\\mathbf{73.13}${\\scriptsize$\\pm0.49$} & $\\mathbf{58.87}${\\scriptsize$\\pm0.77$} & $\\mathbf{77.24}${\\scriptsize$\\pm0.45$} & $\\mathbf{13.52%}$ \\\\     \\bottomrule         [t]",
       "value": "77.24",
-      "context": "94}${\\scriptsize$\\pm0.67$} & $\\mathbf{73.13}${\\scriptsize$\\pm0.49$} & $\\mathbf{58.87}${\\scriptsize$\\pm0.77$} & $\\mathbf{77.24}${\\scriptsize$\\pm0.45$} & $\\mathbf{13.52%}$ \\\\     \\bottomrule         [t]   \\centering   \\includegraphics[width=0.62\\li",
+      "context": "94}${\\scriptsize$\\pm0.67$} & $\\mathbf{73.13}${\\scriptsize$\\pm0.49$} & $\\mathbf{58.87}${\\scriptsize$\\pm0.77$} & $\\mathbf{77.24}${\\scriptsize$\\pm0.45$} & $\\mathbf{13.52%}$ \\\\     \\bottomrule         [t]   \\centering   \\includegraphics[width=0.50\\li",
       "evidence_snippet": "cent: - none: 72.52 +/- 2.31 - SE: 76.31 +/- 0.04 - BAM: 68.12 +/- 2.54 - CBAM: 77.24 +/- 0.45  Mean accuracy per corruption type, percent, averaged over severities"
     },
     {
       "claim": "SE   & $86.83$ & $67.06$ & $74.63$ & $76.75$ \\\\     BAM  & $78.66$ & $53.27$ & $69.40$ & $71.16$ \\\\     CBAM & $\\mathbf{87.33}$ & $\\mathbf{67.53}$ & $\\mathbf{76.05}$ & $\\mathbf{78.05}$ \\\\     \\bottomr",
       "value": "87.33",
-      "context": "SE   & $86.83$ & $67.06$ & $74.63$ & $76.75$ \\\\     BAM  & $78.66$ & $53.27$ & $69.40$ & $71.16$ \\\\     CBAM & $\\mathbf{87.33}$ & $\\mathbf{67.53}$ & $\\mathbf{76.05}$ & $\\mathbf{78.05}$ \\\\     \\bottomrule         [t]   \\centering   \\includegraphic",
+      "context": "SE   & $86.83$ & $67.06$ & $74.63$ & $76.75$ \\\\     BAM  & $78.66$ & $53.27$ & $69.40$ & $71.16$ \\\\     CBAM & $\\mathbf{87.33}$ & $\\mathbf{67.53}$ & $\\mathbf{76.05}$ & $\\mathbf{78.05}$ \\\\     \\bottomrule        The ordering is identical within ev",
       "evidence_snippet": "contrast 53.27, defocus_blur 69.40, elastic_transform 71.16 - CBAM: brightness 87.33, contrast 67.53, defocus_blur 76.05, elastic_transform 78.05  Final-epoch train"
     },
     {
-      "claim": "7.06$ & $74.63$ & $76.75$ \\\\     BAM  & $78.66$ & $53.27$ & $69.40$ & $71.16$ \\\\     CBAM & $\\mathbf{87.33}$ & $\\mathbf{67.53}$ & $\\mathbf{76.05}$ & $\\mathbf{78.05}$ \\\\     \\bottomrule         [t]   \\",
+      "claim": "7.06$ & $74.63$ & $76.75$ \\\\     BAM  & $78.66$ & $53.27$ & $69.40$ & $71.16$ \\\\     CBAM & $\\mathbf{87.33}$ & $\\mathbf{67.53}$ & $\\mathbf{76.05}$ & $\\mathbf{78.05}$ \\\\     \\bottomrule        The orde",
       "value": "67.53",
-      "context": "7.06$ & $74.63$ & $76.75$ \\\\     BAM  & $78.66$ & $53.27$ & $69.40$ & $71.16$ \\\\     CBAM & $\\mathbf{87.33}$ & $\\mathbf{67.53}$ & $\\mathbf{76.05}$ & $\\mathbf{78.05}$ \\\\     \\bottomrule         [t]   \\centering   \\includegraphics[width=0.86\\linewi",
+      "context": "7.06$ & $74.63$ & $76.75$ \\\\     BAM  & $78.66$ & $53.27$ & $69.40$ & $71.16$ \\\\     CBAM & $\\mathbf{87.33}$ & $\\mathbf{67.53}$ & $\\mathbf{76.05}$ & $\\mathbf{78.05}$ \\\\     \\bottomrule        The ordering is identical within every corruption type",
       "evidence_snippet": "defocus_blur 69.40, elastic_transform 71.16 - CBAM: brightness 87.33, contrast 67.53, defocus_blur 76.05, elastic_transform 78.05  Final-epoch training accuracy, pe"
     },
     {
-      "claim": "76.75$ \\\\     BAM  & $78.66$ & $53.27$ & $69.40$ & $71.16$ \\\\     CBAM & $\\mathbf{87.33}$ & $\\mathbf{67.53}$ & $\\mathbf{76.05}$ & $\\mathbf{78.05}$ \\\\     \\bottomrule         [t]   \\centering   \\includ",
+      "claim": "76.75$ \\\\     BAM  & $78.66$ & $53.27$ & $69.40$ & $71.16$ \\\\     CBAM & $\\mathbf{87.33}$ & $\\mathbf{67.53}$ & $\\mathbf{76.05}$ & $\\mathbf{78.05}$ \\\\     \\bottomrule        The ordering is identical w",
       "value": "76.05",
-      "context": "76.75$ \\\\     BAM  & $78.66$ & $53.27$ & $69.40$ & $71.16$ \\\\     CBAM & $\\mathbf{87.33}$ & $\\mathbf{67.53}$ & $\\mathbf{76.05}$ & $\\mathbf{78.05}$ \\\\     \\bottomrule         [t]   \\centering   \\includegraphics[width=0.86\\linewidth]{figures/fig_pe",
+      "context": "76.75$ \\\\     BAM  & $78.66$ & $53.27$ & $69.40$ & $71.16$ \\\\     CBAM & $\\mathbf{87.33}$ & $\\mathbf{67.53}$ & $\\mathbf{76.05}$ & $\\mathbf{78.05}$ \\\\     \\bottomrule        The ordering is identical within every corruption type, so the aggregate",
       "evidence_snippet": "elastic_transform 71.16 - CBAM: brightness 87.33, contrast 67.53, defocus_blur 76.05, elastic_transform 78.05  Final-epoch training accuracy, percent, mean over see"
     },
     {
-      "claim": "& $78.66$ & $53.27$ & $69.40$ & $71.16$ \\\\     CBAM & $\\mathbf{87.33}$ & $\\mathbf{67.53}$ & $\\mathbf{76.05}$ & $\\mathbf{78.05}$ \\\\     \\bottomrule         [t]   \\centering   \\includegraphics[width=0.8",
+      "claim": "& $78.66$ & $53.27$ & $69.40$ & $71.16$ \\\\     CBAM & $\\mathbf{87.33}$ & $\\mathbf{67.53}$ & $\\mathbf{76.05}$ & $\\mathbf{78.05}$ \\\\     \\bottomrule        The ordering is identical within every corrupt",
       "value": "78.05",
-      "context": "& $78.66$ & $53.27$ & $69.40$ & $71.16$ \\\\     CBAM & $\\mathbf{87.33}$ & $\\mathbf{67.53}$ & $\\mathbf{76.05}$ & $\\mathbf{78.05}$ \\\\     \\bottomrule         [t]   \\centering   \\includegraphics[width=0.86\\linewidth]{figures/fig_per_corruption_breakd",
+      "context": "& $78.66$ & $53.27$ & $69.40$ & $71.16$ \\\\     CBAM & $\\mathbf{87.33}$ & $\\mathbf{67.53}$ & $\\mathbf{76.05}$ & $\\mathbf{78.05}$ \\\\     \\bottomrule        The ordering is identical within every corruption type, so the aggregate is not concealing a",
       "evidence_snippet": "- CBAM: brightness 87.33, contrast 67.53, defocus_blur 76.05, elastic_transform 78.05  Final-epoch training accuracy, percent, mean over seeds (reported because it s"
     }
   ],

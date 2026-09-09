@@ -1,0 +1,59 @@
+{
+  "pipeline": "paper-orchestra (PaperOrchestra, arXiv:2604.05018)",
+  "generated": "2026-09-09",
+  "inputs": {
+    "idea.md": "ef94e923149d07d2",
+    "experimental_log.md": "b705e0782f49ddbb",
+    "template.tex": "afe7ecc5cfcf4825",
+    "conference_guidelines.md": "e94beb253d54026b"
+  },
+  "artifacts": {
+    "outline.json": "3d4f824b422c4846",
+    "refs.bib": "231a6e0feebdd58f",
+    "drafts/intro_relwork.tex": "f905110ec545ffc6",
+    "final/paper.tex": "f3dbf841813073dd",
+    "final/paper.pdf": "bab88943e8204796"
+  },
+  "figures": {
+    "fig_accuracy_vs_severity.png": "b594a57a40065186",
+    "fig_per_corruption_breakdown.png": "9d1649d3b2538c5c",
+    "fig_ranking_stability.png": "8048c7bedaac11b5",
+    "fig_relative_robustness_drop.png": "42f76dfab03c177c",
+    "fig_shared_backbone_overview.png": "f53d71d6b8ce0a4d"
+  },
+  "results": {
+    "findings.json": "5d9d0c8db4d1be15",
+    "per_corruption.json": "d83da2239409071a",
+    "resnet18_bam_seed1_corruption_summary.json": "3ed168123c16a4ed",
+    "resnet18_bam_seed2_corruption_summary.json": "e422143345ed074f",
+    "resnet18_bam_seed3_corruption_summary.json": "9e67320f4d4326b8",
+    "resnet18_cbam_seed1_corruption_summary.json": "18bfa093f6c9ea0c",
+    "resnet18_cbam_seed2_corruption_summary.json": "57ab2c7561de15db",
+    "resnet18_cbam_seed3_corruption_summary.json": "37f50ed5be8d1743",
+    "resnet18_none_seed1_corruption_summary.json": "76e64b96413426bf",
+    "resnet18_none_seed2_corruption_summary.json": "1408baa7f5db80ce",
+    "resnet18_none_seed3_corruption_summary.json": "4c2e7d78ece2e1f5",
+    "resnet18_se_seed1_corruption_summary.json": "bf73f043b86b8bee",
+    "resnet18_se_seed2_corruption_summary.json": "527755733b8c0f04",
+    "resnet18_se_seed3_corruption_summary.json": "0dd515fa6ed022bb"
+  },
+  "gates": {
+    "orphan_cite": "PASS",
+    "anti_leakage": "PASS",
+    "claim_evidence": "PASS 11/11",
+    "figure_provenance": "PASS",
+    "figure_dupe": "PASS",
+    "metric_consistency": "PASS",
+    "claim_vs_code": "PASS 3/3",
+    "portable_paths": "OK",
+    "latex_sanity": "false-positive brace error; document compiles"
+  },
+  "compile": {
+    "engine": "tectonic 0.17.0 (XeTeX)",
+    "pages": 9,
+    "undefined_refs": 0
+  },
+  "degraded_steps": {
+    "literature_review": "no S2/Exa key; OpenAlex title-verification, 15 refs"
+  }
+}
