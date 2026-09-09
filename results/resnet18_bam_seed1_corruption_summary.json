@@ -1,0 +1,14 @@
+{
+  "run_name": "resnet18_bam_seed1",
+  "model": "BAM",
+  "seed": 1,
+  "clean_top1": 78.77,
+  "mCA": 65.19050000000001,
+  "relative_robustness_drop": 0.17239431255554122,
+  "per_corruption_mean_accuracy": {
+    "brightness": 75.494,
+    "contrast": 50.076,
+    "defocus_blur": 66.64999999999999,
+    "elastic_transform": 68.542
+  }
+}

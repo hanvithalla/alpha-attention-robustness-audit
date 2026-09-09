@@ -1,0 +1,14 @@
+{
+  "run_name": "resnet18_cbam_seed2",
+  "model": "CBAM",
+  "seed": 2,
+  "clean_top1": 89.3,
+  "mCA": 76.777,
+  "relative_robustness_drop": 0.14023516237402012,
+  "per_corruption_mean_accuracy": {
+    "brightness": 87.05199999999999,
+    "contrast": 66.772,
+    "defocus_blur": 75.502,
+    "elastic_transform": 77.78200000000001
+  }
+}

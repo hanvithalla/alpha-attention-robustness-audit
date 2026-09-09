@@ -211,12 +211,20 @@ def main():
         f"placement, so absolute accuracies are not comparable to published results and none "
         f"is claimed.\n"
         f"- A single dataset at a single resolution was used.\n")
-    if f and f.get("gap_within_seed_noise"):
+    if f and f.get("clean_gap_resolved") is False:
         L.append(
-            "- The clean-accuracy gap between the two best arms is smaller than the largest "
-            "across-seed standard deviation observed. At this budget the arms are therefore "
-            "not separated by more than seed noise, and the ranking should be read as "
-            "unresolved rather than as a measured ordering.\n")
+            f"- The clean-accuracy gap between the two best arms is "
+            f"{fmt(f['clean_top_two_gap_pp'])} percentage points against a combined across-seed "
+            f"standard deviation of {fmt(f['clean_top_two_sd_sum_pp'])} percentage points. On "
+            f"clean data those two arms are therefore not separated by more than seed noise, "
+            f"and their relative order should be read as unresolved rather than measured.\n")
+    if f and f.get("mca_gap_resolved"):
+        L.append(
+            f"- On mean corruption accuracy the same two arms are separated by "
+            f"{fmt(f['mca_top_two_gap_pp'])} percentage points against a combined across-seed "
+            f"standard deviation of {fmt(f['mca_top_two_sd_sum_pp'])} percentage points, which "
+            f"does exceed seed noise. The corruption measurement therefore resolves a "
+            f"difference between these two arms that the clean measurement cannot.\n")
 
     L.append("\n**Decisions**\n")
     L.append(

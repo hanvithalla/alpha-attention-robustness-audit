@@ -19,30 +19,39 @@ We fixed the attention insertion point across all arms rather than reproducing e
 
 **Results**
 Clean top-1 accuracy, percent, mean over 3 seeds with across-seed standard deviation:
-- none: PENDING +/- PENDING
-- SE: PENDING +/- PENDING
-- BAM: PENDING +/- PENDING
-- CBAM: PENDING +/- PENDING
+- none: 86.09 +/- 2.10
+- SE: 89.21 +/- 0.18
+- BAM: 81.56 +/- 2.47
+- CBAM: 89.32 +/- 0.08
 
 Mean corruption accuracy by severity, percent, averaged over 4 corruption types, mean over seeds with standard deviation:
-- none: severity 1 PENDING +/- PENDING, severity 2 PENDING +/- PENDING, severity 3 PENDING +/- PENDING, severity 4 PENDING +/- PENDING, severity 5 PENDING +/- PENDING
-- SE: severity 1 PENDING +/- PENDING, severity 2 PENDING +/- PENDING, severity 3 PENDING +/- PENDING, severity 4 PENDING +/- PENDING, severity 5 PENDING +/- PENDING
-- BAM: severity 1 PENDING +/- PENDING, severity 2 PENDING +/- PENDING, severity 3 PENDING +/- PENDING, severity 4 PENDING +/- PENDING, severity 5 PENDING +/- PENDING
-- CBAM: severity 1 PENDING +/- PENDING, severity 2 PENDING +/- PENDING, severity 3 PENDING +/- PENDING, severity 4 PENDING +/- PENDING, severity 5 PENDING +/- PENDING
+- none: severity 1 83.96 +/- 2.25, severity 2 80.99 +/- 2.93, severity 3 75.53 +/- 3.00, severity 4 67.12 +/- 2.84, severity 5 55.01 +/- 0.99
+- SE: severity 1 87.29 +/- 0.10, severity 2 85.05 +/- 0.05, severity 3 80.09 +/- 0.23, severity 4 71.98 +/- 0.06, severity 5 57.16 +/- 0.05
+- BAM: severity 1 79.28 +/- 2.71, severity 2 75.51 +/- 3.09, severity 3 70.08 +/- 3.08, severity 4 62.83 +/- 2.67, severity 5 52.91 +/- 2.20
+- CBAM: severity 1 87.68 +/- 0.22, severity 2 85.58 +/- 0.28, severity 3 80.94 +/- 0.67, severity 4 73.13 +/- 0.49, severity 5 58.87 +/- 0.77
 
 Mean corruption accuracy across all severities (mCA), percent:
-- none: PENDING +/- PENDING
-- SE: PENDING +/- PENDING
-- BAM: PENDING +/- PENDING
-- CBAM: PENDING +/- PENDING
+- none: 72.52 +/- 2.31
+- SE: 76.31 +/- 0.04
+- BAM: 68.12 +/- 2.54
+- CBAM: 77.24 +/- 0.45
 
 Relative robustness drop, (clean - corrupted) / clean, percent:
-- none: PENDING +/- PENDING
-- SE: PENDING +/- PENDING
-- BAM: PENDING +/- PENDING
-- CBAM: PENDING +/- PENDING
+- none: 15.77 +/- 0.74
+- SE: 14.45 +/- 0.21
+- BAM: 16.49 +/- 0.98
+- CBAM: 13.52 +/- 0.46
 
-Ranking results: PENDING
+Ranking by clean accuracy, best first: CBAM > SE > none > BAM
+Ranking at severity 1, best first: CBAM > SE > none > BAM
+Ranking at severity 2, best first: CBAM > SE > none > BAM
+Ranking at severity 3, best first: CBAM > SE > none > BAM
+Ranking at severity 4, best first: CBAM > SE > none > BAM
+Ranking at severity 5, best first: CBAM > SE > none > BAM
+Ranking by mCA, best first: CBAM > SE > none > BAM
+Ranking by relative robustness drop, smallest drop first: CBAM > SE > none > BAM
+Largest across-seed standard deviation observed in any cell: 3.09 percentage points
+Clean-accuracy gap between the two best arms: 0.11 percentage points
 
 **Baselines**
 - none (attention-free ResNet-18): trained by us from scratch under the identical budget. No externally obtained or pretrained checkpoint was used for any arm.
@@ -60,6 +69,8 @@ Ranking results: PENDING
 - The training budget of 10 epochs is matched across arms, which is what the ranking claim requires, but it is short. Longer training could change absolute accuracies and in principle the ordering.
 - Holding the insertion point fixed means no arm reproduces its own paper's placement, so absolute accuracies are not comparable to published results and none is claimed.
 - A single dataset at a single resolution was used.
+- The clean-accuracy gap between the two best arms is 0.11 percentage points against a combined across-seed standard deviation of 0.26 percentage points. On clean data those two arms are therefore not separated by more than seed noise, and their relative order should be read as unresolved rather than measured.
+- On mean corruption accuracy the same two arms are separated by 0.92 percentage points against a combined across-seed standard deviation of 0.49 percentage points, which does exceed seed noise. The corruption measurement therefore resolves a difference between these two arms that the clean measurement cannot.
 
 **Decisions**
 - We fixed one insertion point across all arms rather than reproducing each method's own convention, so that a measured difference is attributable to the module and not to its placement.

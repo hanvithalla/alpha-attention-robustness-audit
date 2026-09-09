@@ -9,3 +9,4 @@ runs_bench/
 runs_smoketest/
 workspace/cache/
 workspace/refinement/
+!results/

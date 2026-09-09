@@ -78,8 +78,10 @@ def main():
     print(f"ranking holds      : {f['ranking_holds_at_every_severity']}")
     print(f"flips at severities: {f['severities_where_ranking_flips'] or 'none'}")
     print(f"max seed std       : {f['max_seed_std_pp']:.2f} pp")
-    print(f"clean top-2 gap    : {f['clean_top_two_gap_pp']:.2f} pp")
-    print(f"gap within noise   : {f['gap_within_seed_noise']}")
+    print(f"clean top-2 gap    : {f['clean_top_two_gap_pp']:.2f} pp vs sd sum "
+          f"{f['clean_top_two_sd_sum_pp']:.2f} -> resolved={f['clean_gap_resolved']}")
+    print(f"mCA   top-2 gap    : {f['mca_top_two_gap_pp']:.2f} pp vs sd sum "
+          f"{f['mca_top_two_sd_sum_pp']:.2f} -> resolved={f['mca_gap_resolved']}")
     print("=" * 62)
 
 

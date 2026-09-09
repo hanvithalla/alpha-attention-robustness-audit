@@ -1,0 +1,14 @@
+{
+  "run_name": "resnet18_none_seed3",
+  "model": "none",
+  "seed": 3,
+  "clean_top1": 86.16,
+  "mCA": 72.12499999999999,
+  "relative_robustness_drop": 0.16289461467038083,
+  "per_corruption_mean_accuracy": {
+    "brightness": 84.058,
+    "contrast": 59.104,
+    "defocus_blur": 71.55,
+    "elastic_transform": 73.788
+  }
+}

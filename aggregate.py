@@ -170,15 +170,42 @@ def main():
                      "Choosing between these blocks on clean top-1 alone would pick a different "
                      "winner than corruption robustness does.")
 
-    # Is any gap actually bigger than seed noise?
+    # Is the top-two gap bigger than seed noise? The comparison must use the
+    # spread of the two arms being compared -- not the largest spread anywhere
+    # in the grid, which here belongs to the noisy baseline/BAM arms and would
+    # wrongly declare a resolvable difference unresolved.
+    def resolve(pairs):
+        """pairs: [(variant, mean, std)] -> (top, second, gap, sd_sum, resolved)."""
+        ordered = sorted(pairs, key=lambda t: -t[1])
+        if len(ordered) < 2:
+            return None
+        (v1, m1, s1), (v2, m2, s2) = ordered[0], ordered[1]
+        gap, sd_sum = m1 - m2, s1 + s2
+        return v1, v2, gap, sd_sum, gap > sd_sum
+
+    clean_res = resolve([(v, agg[(v, 0)][0], agg[(v, 0)][1]) for v in variants if (v, 0) in agg])
+    mca_res = resolve([(v, mca[v][0], mca[v][1]) for v in variants if v in mca])
     max_std = max((sd for (_, sd) in agg.values()), default=0.0)
-    clean_vals = sorted((agg[(v, 0)][0] for v in variants if (v, 0) in agg), reverse=True)
-    top_gap = clean_vals[0] - clean_vals[1] if len(clean_vals) > 1 else float("nan")
-    lines.append(f"\nLargest per-cell seed std: {max_std:.2f} pp. "
-                 f"Clean-accuracy gap between the top two arms: {top_gap:.2f} pp. "
-                 + ("**The gap is within seed noise, so the ranking is not resolved at this budget.**"
-                    if top_gap < max_std else
-                    "The top-two gap exceeds the largest seed std."))
+
+    lines.append("\n## Is the top-two gap resolvable at this budget?\n")
+    lines.append("| Metric | Top two | Gap (pp) | Sum of their seed sds | Resolved? |")
+    lines.append("|---|---|---|---|---|")
+    for name, r in (("Clean top-1", clean_res), ("mCA", mca_res)):
+        if r:
+            v1, v2, gap, sd_sum, ok = r
+            lines.append(f"| {name} | {v1} vs {v2} | {gap:.2f} | {sd_sum:.2f} | "
+                         f"{'**yes**' if ok else 'no'} |")
+    lines.append(f"\nLargest per-cell seed std anywhere in the grid: {max_std:.2f} pp "
+                 f"(from the higher-variance {'/'.join(v for v in variants if any(agg[(v, s)][1] > 1.5 for s in [0] + severities if (v, s) in agg))} "
+                 f"arms). That figure is reported for completeness but is not the right "
+                 f"denominator for a two-arm comparison.")
+    if clean_res and mca_res and not clean_res[4] and mca_res[4]:
+        lines.append(f"\n**The two metrics disagree about what is resolvable.** Clean accuracy "
+                     f"cannot separate {clean_res[0]} from {clean_res[1]} ({clean_res[2]:.2f} pp, "
+                     f"inside their combined seed spread of {clean_res[3]:.2f} pp), but mean "
+                     f"corruption accuracy can ({mca_res[2]:.2f} pp against {mca_res[3]:.2f} pp). "
+                     f"On this method set the corruption axis is the more discriminative "
+                     f"measurement, not the noisier one.")
 
     (out / "ranking_table.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
 
@@ -195,8 +222,12 @@ def main():
         "mCA": {v: {"mean": mca[v][0], "std": mca[v][1]} for v in mca},
         "relative_robustness_drop": {v: {"mean": rel_drop[v][0], "std": rel_drop[v][1]} for v in rel_drop},
         "max_seed_std_pp": max_std,
-        "clean_top_two_gap_pp": top_gap,
-        "gap_within_seed_noise": bool(top_gap < max_std),
+        "clean_top_two_gap_pp": clean_res[2] if clean_res else None,
+        "clean_top_two_sd_sum_pp": clean_res[3] if clean_res else None,
+        "clean_gap_resolved": bool(clean_res[4]) if clean_res else None,
+        "mca_top_two_gap_pp": mca_res[2] if mca_res else None,
+        "mca_top_two_sd_sum_pp": mca_res[3] if mca_res else None,
+        "mca_gap_resolved": bool(mca_res[4]) if mca_res else None,
     }
     (out / "findings.json").write_text(json.dumps(findings, indent=2), encoding="utf-8")
 

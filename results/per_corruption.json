@@ -1,0 +1,26 @@
+{
+  "none": {
+    "brightness": 83.762,
+    "contrast": 59.659333333333336,
+    "defocus_blur": 72.28333333333335,
+    "elastic_transform": 74.38466666666666
+  },
+  "SE": {
+    "brightness": 86.82600000000001,
+    "contrast": 67.05533333333334,
+    "defocus_blur": 74.63,
+    "elastic_transform": 76.748
+  },
+  "BAM": {
+    "brightness": 78.65866666666666,
+    "contrast": 53.26733333333334,
+    "defocus_blur": 69.39733333333334,
+    "elastic_transform": 71.16199999999999
+  },
+  "CBAM": {
+    "brightness": 87.33,
+    "contrast": 67.526,
+    "defocus_blur": 76.05066666666666,
+    "elastic_transform": 78.04866666666668
+  }
+}
