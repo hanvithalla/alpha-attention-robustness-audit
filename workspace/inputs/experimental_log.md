@@ -36,6 +36,18 @@ Mean corruption accuracy across all severities (mCA), percent:
 - BAM: 68.12 +/- 2.54
 - CBAM: 77.24 +/- 0.45
 
+Mean accuracy per corruption type, percent, averaged over severities 1 through 5 and over seeds:
+- none: brightness 83.76, contrast 59.66, defocus_blur 72.28, elastic_transform 74.38
+- SE: brightness 86.83, contrast 67.06, defocus_blur 74.63, elastic_transform 76.75
+- BAM: brightness 78.66, contrast 53.27, defocus_blur 69.40, elastic_transform 71.16
+- CBAM: brightness 87.33, contrast 67.53, defocus_blur 76.05, elastic_transform 78.05
+
+Final-epoch training accuracy, percent, mean over seeds (reported because it separates underfitting from a worse optimum):
+- none: 87.90
+- SE: 91.88
+- BAM: 82.79
+- CBAM: 92.48
+
 Relative robustness drop, (clean - corrupted) / clean, percent:
 - none: 15.77 +/- 0.74
 - SE: 14.45 +/- 0.21

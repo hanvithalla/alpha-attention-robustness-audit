@@ -30,6 +30,17 @@ def load_findings():
     return json.loads(p.read_text()) if p.exists() else None
 
 
+def final_train_acc(variant):
+    """Mean final-epoch training accuracy across seeds, or None if absent."""
+    vals = []
+    for c in sorted(Path("runs").glob(f"resnet18_{variant.lower()}_seed*.csv")):
+        with open(c, newline="") as f:
+            rows = list(csv.DictReader(f))
+        if rows:
+            vals.append(float(rows[-1]["train_acc"]))
+    return sum(vals) / len(vals) if vals else None
+
+
 def epochs_from_runs():
     for c in Path("runs").glob("*.csv"):
         with open(c) as f:
@@ -147,6 +158,21 @@ def main():
     for v in variants:
         e = f["mCA"].get(v) if f else None
         L.append(f"- {v}: {fmt(e['mean'] if e else None)} +/- {fmt(e['std'] if e else None)}\n")
+
+    per_corr_path = RESULTS / "per_corruption.json"
+    if per_corr_path.exists():
+        per = json.loads(per_corr_path.read_text())
+        L.append("\nMean accuracy per corruption type, percent, averaged over severities 1 "
+                 "through 5 and over seeds:\n")
+        for v in variants:
+            cells = ", ".join(f"{c} {fmt(per.get(v, {}).get(c))}" for c in corruptions)
+            L.append(f"- {v}: {cells}\n")
+
+    L.append("\nFinal-epoch training accuracy, percent, mean over seeds (reported because it "
+             "separates underfitting from a worse optimum):\n")
+    for v in variants:
+        ta = final_train_acc(v)
+        L.append(f"- {v}: {fmt(ta)}\n")
 
     L.append("\nRelative robustness drop, (clean - corrupted) / clean, percent:\n")
     for v in variants:

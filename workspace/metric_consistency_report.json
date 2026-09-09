@@ -1,0 +1,37 @@
+{
+  "warnings": [],
+  "occurrences": [
+    {
+      "metric": "accuracy",
+      "value": 13.52,
+      "aggregate": false,
+      "line": 456,
+      "context": "igned to catch a spurious robustness advantage. CBAM loses $13.52%$ of its clean accuracy, SE $1"
+    },
+    {
+      "metric": "accuracy",
+      "value": 14.45,
+      "aggregate": false,
+      "line": 457,
+      "context": "s advantage. CBAM loses $13.52%$ of its clean accuracy, SE $14.45%$, the baseline $15.77%$, and"
+    },
+    {
+      "metric": "accuracy",
+      "value": 15.77,
+      "aggregate": false,
+      "line": 457,
+      "context": "$13.52%$ of its clean accuracy, SE $14.45%$, the baseline $15.77%$, and BAM $16.49%$. The order"
+    },
+    {
+      "metric": "accuracy",
+      "value": 16.49,
+      "aggregate": false,
+      "line": 457,
+      "context": "lean accuracy, SE $14.45%$, the baseline $15.77%$, and BAM $16.49%$. The ordering is unchanged,"
+    }
+  ],
+  "summary": {
+    "metrics_checked": 1,
+    "warnings": 0
+  }
+}

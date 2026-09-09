@@ -1,0 +1,7 @@
+{
+  "fig_shared_backbone_overview": "The shared residual block and its single attention slot. Every arm uses this identical block; only the module $A$ changes, and the identity shortcut never passes through it. Holding the insertion point fixed is what makes a measured difference attributable to the module rather than to its placement.",
+  "fig_accuracy_vs_severity": "Top-1 accuracy against corruption severity, averaged over four corruption types and three seeds, with across-seed standard deviation as error bars. The curves do not cross at any severity: the ordering established on clean data is the ordering at every level of corruption.",
+  "fig_relative_robustness_drop": "Relative robustness drop, (clean $-$ corrupted) $/$ clean, per arm with across-seed standard deviation. Normalising by each arm's own clean accuracy prevents an arm that starts lower from appearing robust merely because it had less accuracy to lose; the ordering is unchanged from the absolute measure.",
+  "fig_per_corruption_breakdown": "Mean accuracy per corruption type, averaged over severities 1--5 and three seeds. Reporting the breakdown alongside the four-type mean makes a type-specific skew visible: contrast is the most damaging corruption for every arm, and also where the attention arms separate most from the baseline.",
+  "fig_ranking_stability": "Rank position of each arm at clean and at each corruption severity. A reordering would appear as crossing lines; none occurs, which is the paper's central negative result stated in its most direct form."
+}

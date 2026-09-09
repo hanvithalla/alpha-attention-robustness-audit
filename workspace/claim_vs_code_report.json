@@ -1,0 +1,44 @@
+{
+  "code_files": [
+    "attention-robustness\\code\\aggregate.py",
+    "attention-robustness\\code\\attention.py",
+    "attention-robustness\\code\\cifar10c.py",
+    "attention-robustness\\code\\data_cifar10.py",
+    "attention-robustness\\code\\evaluate.py",
+    "attention-robustness\\code\\model.py",
+    "attention-robustness\\code\\requirements.txt",
+    "attention-robustness\\code\\train.py",
+    "attention-robustness\\code\\verify_milestones.py"
+  ],
+  "supported": [
+    {
+      "kind": "hyperparameter",
+      "claim": "sing is identical for clean and corrupted images. Every arm receives an identical recipe: SGD with learning rate $0.1$, momentum $0.9$, weight decay $5 10^ -4 $, batch size $128$, cosine annealing~ , ",
+      "value": "learning rate=0.1",
+      "context": "sing is identical for clean and corrupted images. Every arm receives an identical recipe: SGD with learning rate $0.1$, momentum $0.9$, weight decay $5 10^ -4 $, batch size $128$, cosine annealing~ , and standard augm",
+      "evidence_file": "attention-robustness\\code\\evaluate.py"
+    },
+    {
+      "kind": "hyperparameter",
+      "claim": "pted images. Every arm receives an identical recipe: SGD with learning rate $0.1$, momentum $0.9$, weight decay $5 10^ -4 $, batch size $128$, cosine annealing~ , and standard augmentation (random $32",
+      "value": "weight decay=5",
+      "context": "pted images. Every arm receives an identical recipe: SGD with learning rate $0.1$, momentum $0.9$, weight decay $5 10^ -4 $, batch size $128$, cosine annealing~ , and standard augmentation (random $32 32$ crop with",
+      "evidence_file": "attention-robustness\\code\\attention.py"
+    },
+    {
+      "kind": "hyperparameter",
+      "claim": "ceives an identical recipe: SGD with learning rate $0.1$, momentum $0.9$, weight decay $5 10^ -4 $, batch size $128$, cosine annealing~ , and standard augmentation (random $32 32$ crop with 4-pixel pa",
+      "value": "batch size=128",
+      "context": "ceives an identical recipe: SGD with learning rate $0.1$, momentum $0.9$, weight decay $5 10^ -4 $, batch size $128$, cosine annealing~ , and standard augmentation (random $32 32$ crop with 4-pixel padding, random h",
+      "evidence_file": "attention-robustness\\code\\model.py"
+    }
+  ],
+  "unsupported": [],
+  "summary": {
+    "total": 3,
+    "supported": 3,
+    "unsupported": 0,
+    "code_files": 9,
+    "experiments": 1
+  }
+}

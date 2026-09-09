@@ -1,0 +1,640 @@
+\documentclass[10pt]{article}
+
+% ── Core packages ─────────────────────────────────────────────────────────────
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+
+% ── Page geometry (NeurIPS/ICML style: 6.5in × 9in text block) ───────────────
+\usepackage[
+  top=1in, bottom=1in,
+  left=0.75in, right=0.75in,
+  columnsep=0.25in
+]{geometry}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{4pt}
+
+% ── Mathematics ───────────────────────────────────────────────────────────────
+\usepackage{amsmath,amssymb,amsthm}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{proposition}{Proposition}
+\newtheorem{definition}{Definition}
+\newtheorem{corollary}{Corollary}
+
+% ── Figures and tables ────────────────────────────────────────────────────────
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{subcaption}
+
+% ── Hyperlinks and references ─────────────────────────────────────────────────
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\usepackage{natbib}
+
+% ── Utilities ─────────────────────────────────────────────────────────────────
+\usepackage{xcolor}
+\usepackage{url}
+\usepackage{enumitem}
+
+% ─────────────────────────────────────────────────────────────────────────────
+
+\begin{document}
+
+\title{Do Published Attention-Block Gains Survive Common Image Corruptions?\\
+A Matched-Budget CIFAR-10 / CIFAR-10-C Stress Test of SE, BAM, and CBAM}
+\author{Anonymous Submission}
+\date{}
+\maketitle
+
+\begin{abstract}
+Channel and spatial attention blocks are compared almost exclusively on clean
+test accuracy, and one of them positions itself as an improvement over another
+on precisely that basis. Whether the ordering this induces survives the
+distribution shift a deployed classifier meets has not been tested for this
+method family under a matched protocol. We train squeeze-and-excitation, the
+bottleneck attention module, and the convolutional block attention module, plus
+an attention-free baseline, into one shared CIFAR-scale residual backbone at an
+identical budget, inserting each module at the identical point so that only the
+module varies, and evaluate the resulting twelve checkpoints on CIFAR-10-C
+without retraining. The clean-accuracy ordering
+$\text{CBAM} > \text{SE} > \text{none} > \text{BAM}$ is preserved at every
+corruption severity, on mean corruption accuracy, and on a
+starting-point-normalised relative degradation measure: for this method set the
+field's single metric was not misleading. Two secondary findings complicate the
+picture. Clean accuracy cannot separate the top two arms ($0.11$ pp against a
+combined across-seed spread of $0.26$ pp) whereas mean corruption accuracy can
+($0.92$ pp against $0.49$ pp), so the corruption axis is here the more
+discriminative measurement rather than the noisier one; and the parallel
+channel-plus-spatial module falls $4.5$ pp \emph{below} the attention-free
+baseline. We also report a discrepancy between that module's published fusion
+equation and the fusion its official code computes.
+\end{abstract}
+
+% ── 1. Introduction ───────────────────────────────────────────────────────────
+\section{Introduction}
+\label{sec:introduction}
+
+Attention blocks are among the cheapest architectural additions in modern
+computer vision. A handful of extra parameters inserted into an existing
+backbone is reported to buy a consistent accuracy gain, and
+squeeze-and-excitation (SE)~\citep{hu2018squeeze}, the bottleneck attention
+module (BAM)~\citep{park2018bam}, and the convolutional block attention module
+(CBAM)~\citep{woo2018cbam} have become canonical instances of the
+pattern~\citep{guo2022attention}. Their reported gains are the reason the
+applied literature routinely bolts them onto convolutional networks.
+
+Those gains are all reported on clean test data. Each of these methods is
+evaluated on top-1 and top-5 accuracy, and CBAM positions itself explicitly as
+an improvement over SE's channel-only design on that basis. None reports how
+the resulting models behave when the input distribution shifts.
+
+This matters because the ordering these papers induce is what a practitioner
+actually consumes. Someone selecting an attention block for a deployed
+classifier reads off a ranking measured under conditions the deployment will
+not reproduce: sensors defocus, illumination drifts, contrast collapses, images
+are recompressed in transit. Convolutional classifiers are known to be brittle
+to exactly these
+perturbations~\citep{hendrycks2019benchmarking,geirhos2019imagenet}, and a
+substantial literature now treats corruption robustness as a first-class
+evaluation axis~\citep{hendrycks2020augmix}. The question that follows is
+therefore not whether attention blocks improve clean accuracy, but whether the
+\emph{ordering} they induce on clean data is the ordering that survives
+corruption.
+
+The existing literature cannot answer this, for two reasons. First, each method
+is validated in its own backbone, at its own scale, under its own training
+recipe, so a cross-paper accuracy difference conflates the module with the
+architecture and the optimisation schedule. Second, and more subtly, BAM and
+CBAM originate from a single shared public implementation and inherit a common
+insertion convention that an independently reimplemented SE does not; even a
+same-codebase comparison therefore confounds module identity with module
+placement.
+
+We remove both confounds. All three attention blocks, plus an attention-free
+baseline, are trained into one shared CIFAR-scale residual
+backbone~\citep{he2016deep}, with each module inserted at the identical point in
+the identical block, under an identical optimiser, schedule, augmentation
+policy, epoch budget and seed set. Because the module is the only term that
+varies, any measured difference is attributable to the module itself. We then
+evaluate the trained checkpoints, without retraining, on a common-corruption
+benchmark that shares the clean dataset's exact label space and
+resolution~\citep{hendrycks2019benchmarking,krizhevsky2009learning}, and re-rank
+the arms by mean corruption accuracy and by a relative degradation measure
+rather than by clean top-1.
+
+Our hypothesis was that the ranking might not be invariant. Channel-only
+recalibration derives its gate from a globally pooled descriptor, whereas the
+spatial branches of BAM and CBAM compute attention from local feature
+statistics. Spatial masks depend on where informative structure lies in the
+image, and corruptions such as defocus blur and contrast reduction attack that
+structure directly, so a spatial gate that mislocalises under corruption could
+degrade faster than a channel-only gate. We stressed in advance that the
+competing outcome is equally informative, and committed to reporting it as
+prominently. That is the outcome we obtained.
+
+Our contributions are:
+
+\begin{itemize}[leftmargin=1.5em]
+  \item \textbf{A matched-budget, single-backbone comparison} of three published
+    attention blocks against an attention-free baseline, in which backbone,
+    insertion point, optimiser, schedule, augmentation and seed set are all held
+    fixed, so that differences are attributable to the module rather than to its
+    host or its placement.
+  \item \textbf{A negative result, reported as the primary finding.} The
+    clean-accuracy ordering is preserved at every corruption severity, on mean
+    corruption accuracy, and on relative degradation. For this method set,
+    ranking on clean top-1 was not misleading.
+  \item \textbf{A measurement-power observation that qualifies it.} Clean
+    accuracy cannot resolve the top two arms, while mean corruption accuracy
+    can. The corruption axis is here the more discriminative measurement, which
+    is a reason to report it even when it does not reorder anything.
+  \item \textbf{A provenance record}, including a discrepancy between BAM's
+    published fusion equation and the fusion its official public code computes,
+    which to our knowledge has not previously been reported.
+\end{itemize}
+
+Section~\ref{sec:related} positions the work. Section~\ref{sec:method} describes
+the backbone, the modules and their provenance, and the fidelity checks.
+Section~\ref{sec:setup} gives the protocol and metrics. Section~\ref{sec:results}
+reports results and answers the title question. Section~\ref{sec:limitations}
+scopes the claim and Section~\ref{sec:conclusion} concludes.
+
+% ── 2. Related Work ───────────────────────────────────────────────────────────
+\section{Related Work}
+\label{sec:related}
+
+\subsection{Channel and Spatial Attention Blocks}
+
+Squeeze-and-excitation~\citep{hu2018squeeze} introduced channel-only feature
+recalibration: global average pooling reduces a feature map to a per-channel
+descriptor, a two-layer bottleneck multilayer perceptron maps that descriptor to
+per-channel gates, a sigmoid bounds them, and the features are rescaled
+channel-wise. The design is cheap, architecture-agnostic, and widely adopted;
+subsequent work has refined the channel-gating mechanism itself, for example by
+replacing the bottleneck with a local cross-channel
+interaction~\citep{wang2020eca}.
+
+BAM~\citep{park2018bam} and CBAM~\citep{woo2018cbam} extend this by adding a
+spatial branch. BAM computes channel and spatial attention in parallel and fuses
+them; CBAM applies channel attention and then spatial attention in sequence, and
+pools both average and maximum statistics in its channel gate. Both spatial
+branches derive their attention maps from local feature statistics rather than
+from a global descriptor, which is the property our hypothesis turned on. Broad
+surveys confirm the pattern across the family~\citep{guo2022attention}.
+
+What unites this cluster for our purposes is its evaluation protocol. The
+metrics reported are clean top-1 and top-5 classification accuracy, with mean
+average precision added where detection is evaluated. No member of this cluster
+reports a robustness or distribution-shift metric, so the relative ordering
+these papers establish has never been tested away from the clean distribution.
+
+\subsection{Corruption Robustness Benchmarking}
+
+A parallel literature evaluates classifiers under synthetic but realistic
+corruptions applied at graded severities~\citep{hendrycks2019benchmarking}. The
+protocol fixes a set of corruption types, applies each at five severity levels,
+and summarises degradation across the grid, which makes it possible to compare
+how fast models degrade rather than only where they start. Related work
+established that convolutional classifiers rely on cues these corruptions
+disrupt~\citep{geirhos2019imagenet}, and that targeted augmentation can mitigate
+the damage~\citep{hendrycks2020augmix}.
+
+The corrupted benchmark used here shares the clean dataset's exact label space
+and resolution~\citep{krizhevsky2009learning}, so evaluating a trained model on
+it requires inference only: no retraining, no relabelling, no architectural
+change. That is what makes the audit cheap enough to be worth running, and makes
+its absence from the attention-block literature harder to explain.
+
+Characteristically, however, this literature deploys corruption benchmarks to
+\emph{validate a newly proposed intervention}. The benchmark is the evidence
+that a new method helps, rather than the instrument for auditing the ranking of
+methods that already exist.
+
+\subsection{Attention Mechanisms Under Distribution Shift}
+
+Recent work sits at the intersection. Attention-guided repair procedures improve
+the robustness of convolutional networks against common
+corruptions~\citep{ar2repair2025}, and channel attention has been combined with
+multi-scale push--pull inhibition to the same end~\citep{pushpull2025}. Both are
+validated on corruption benchmarks of the kind we use.
+
+Both, however, are proposals: each introduces a new mechanism and uses the
+corruption benchmark as evidence that it works. Neither is a head-to-head
+comparison of the already-published blocks under a single matched training
+protocol with a fixed insertion point. That controlled comparison, and the
+ranking-stability question it makes answerable, is the gap this paper fills.
+
+% ── 3. Method ─────────────────────────────────────────────────────────────────
+\section{Method}
+\label{sec:method}
+
+\subsection{Shared Backbone and a Single Insertion Point}
+\label{sec:backbone}
+
+All arms use one CIFAR-adapted ResNet-18: a $3\times3$ stride-1 stem with no
+initial max-pool, preserving $32\times32$ spatial detail, followed by four
+stages of two basic blocks at widths $64/128/256/512$, global average pooling,
+and a linear classifier. Within each basic block the attention module is applied
+to the residual branch after the second batch
+normalisation~\citep{ioffe2015batch} and before the residual addition:
+%
+\begin{equation}
+  \mathrm{out} = \mathrm{ReLU}\!\left(
+    A\big(\mathrm{BN}_2(\mathrm{conv}_2(\mathrm{ReLU}(\mathrm{BN}_1(\mathrm{conv}_1(x)))))\big)
+    + \mathrm{shortcut}(x)\right),
+  \label{eq:block}
+\end{equation}
+%
+where $A$ is the attention module under test, or the identity for the baseline
+arm. The identity shortcut never passes through $A$. Figure~\ref{fig:backbone}
+shows the block.
+
+Because $A$ is the only term in Equation~\ref{eq:block} that varies, any
+measured difference is attributable to the module rather than to placement, host
+architecture, or training recipe. This is the study's primary confound control.
+It has a cost, which we state plainly: no arm reproduces its own paper's
+placement --- official BAM sits \emph{between} stages rather than inside blocks
+--- so absolute accuracies here are not comparable to published numbers, and we
+claim none. Only the within-study ordering is claimed.
+
+The arms differ only by attention parameters: $11.17$M for the baseline,
+$11.26$M for SE, $11.36$M for BAM, and $11.26$M for CBAM.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.86\linewidth]{figures/fig_shared_backbone_overview.png}
+  \caption{The shared residual block and its single attention slot. Every arm
+  uses this identical block; only the module $A$ changes, and the identity
+  shortcut never passes through it. Holding the insertion point fixed is what
+  makes a measured difference attributable to the module rather than to its
+  placement.}
+  \label{fig:backbone}
+\end{figure}
+
+\subsection{Attention Modules and Their Provenance}
+\label{sec:modules}
+
+\textbf{SE} is reimplemented from Equations 2--3 of~\citet{hu2018squeeze}:
+global average pool to $z \in \mathbb{R}^{C}$, then
+$s = \sigma(W_2\,\delta(W_1 z))$ with $W_1 \in \mathbb{R}^{(C/r) \times C}$,
+then channel-wise rescale by $s$. This is the study's one reimplementation, and
+it is necessary: the official release is Caffe-only, consisting of
+\texttt{.prototxt} model definitions with custom \texttt{.cpp}/\texttt{.cu}
+layers, and contains no Python. The block is fully specified by two equations,
+so the reimplementation is unambiguous. We use $r=16$, the paper's default, and
+record it as one point in the design space rather than a re-derivation of a
+tuned value.
+
+\textbf{BAM} and \textbf{CBAM} are ported directly from the module definitions
+of the official public implementation. We take only the module definitions; the
+repository's own ImageNet-scale model file is not used. Layer types, ordering,
+pooling choices, bias settings, batch-norm placement and hyperparameters,
+$C/r$ bottleneck widths, channel-pool concatenation order and BAM's dilation-4
+convolution stack are all preserved. The only change is replacing a deprecated
+sigmoid entry point removed from modern versions of the framework; the
+repository has had no commits since March 2023 and ships no dependency pins.
+
+Two details are load-bearing, because conflating them would silently weaken the
+comparison.
+
+\emph{BAM's and CBAM's channel gates are different mechanisms.} Both files
+define a class of the same name, but BAM's pools average statistics only and
+places a one-dimensional batch normalisation between its MLP layers, while
+CBAM's pools average \emph{and} maximum statistics through a shared MLP with no
+normalisation. Sharing one implementation between the two arms would partially
+collapse the channel-only-versus-channel-plus-spatial contrast this study
+measures.
+
+\emph{BAM's paper and its official code disagree on the fusion operator.}
+\citet{park2018bam} specify additive fusion,
+$M(F) = \sigma(M_c(F) + M_s(F))$. The official code instead computes
+$\mathrm{att} = 1 + \sigma(M_c(F) \cdot M_s(F))$ and returns
+$\mathrm{att} \cdot F$: a multiplicative fusion with a residual offset. Since
+the artefact this literature actually reuses is the code rather than the
+equation, we follow the code, and we report the discrepancy rather than
+resolving it silently. To our knowledge it has not previously been noted.
+
+\subsection{Mechanical Verification of Module Fidelity}
+\label{sec:verification}
+
+The comparison's validity rests entirely on the modules being what they claim to
+be, so fidelity is asserted mechanically rather than by inspection. A
+verification suite of 54 checks asserts structural properties --- BAM's
+average-only pooling and one-dimensional batch normalisation, CBAM's dual
+pooling and batch-normalised $7\times7$ spatial convolution, SE's pooling,
+bottleneck width and sigmoid gate --- and, critically, behavioural ones. BAM's
+output-to-input ratio must lie in $(1,2)$, as $1 + \sigma(\cdot)$ requires, and
+CBAM's in $(0,1)$, as a pure multiplicative gate requires. Fusion semantics are
+thus verified by behaviour rather than by reading source code. The suite also
+asserts that the two channel-gate classes are distinct objects, so the defect
+described in Section~\ref{sec:modules} cannot silently return. It runs before
+every training installment.
+
+% ── 4. Experimental Setup ─────────────────────────────────────────────────────
+\section{Experimental Setup}
+\label{sec:setup}
+
+\subsection{Data and Training Protocol}
+
+Training and clean evaluation use CIFAR-10~\citep{krizhevsky2009learning}:
+$50{,}000$ training and $10{,}000$ test images at $32\times32$ across 10
+classes. Corrupted evaluation uses CIFAR-10-C~\citep{hendrycks2019benchmarking},
+restricted to four corruption types --- brightness, contrast, defocus blur and
+elastic transform --- at severities 1 through 5, with $10{,}000$ images per type
+and severity. Test-time preprocessing is identical for clean and corrupted
+images.
+
+Every arm receives an identical recipe: SGD with learning rate $0.1$, momentum
+$0.9$, weight decay $5\times10^{-4}$, batch size $128$, cosine
+annealing~\citep{loshchilov2017sgdr}, and standard augmentation (random
+$32\times32$ crop with 4-pixel padding, random horizontal flip). The budget is
+10 epochs per run and the seed set is $\{1,2,3\}$, giving 12 training runs. No
+arm uses a pretrained or externally obtained checkpoint. Mixed
+precision~\citep{micikevicius2018mixed} is used for training; validation runs in
+full precision so that checkpoint selection and final evaluation share one
+numeric path. All runs used a single NVIDIA RTX A2000 with 6\,GB of memory.
+
+\subsection{Metrics}
+
+We report three. \emph{Clean top-1 accuracy} is the metric the field currently
+ranks on and the severity-zero reference point. \emph{Mean corruption accuracy}
+(mCA) at each severity averages over corruption types. \emph{Relative robustness
+drop}, $(\text{clean} - \text{corrupted})/\text{clean}$, normalises out each
+arm's clean starting point so that an arm beginning lower is not mistaken for a
+robust one merely because it had less accuracy to lose.
+
+All results are averaged over seeds and reported with the across-seed standard
+deviation. Before any ordering is claimed, we check whether the gap between the
+top two arms exceeds their combined across-seed spread. We compare against the
+spread of the two arms being compared, not the largest spread anywhere in the
+grid; the latter belongs to the higher-variance baseline and BAM arms and would
+wrongly declare a resolvable difference unresolved.
+
+% ── 5. Results ────────────────────────────────────────────────────────────────
+\section{Results and Analysis}
+\label{sec:results}
+
+\subsection{Accuracy Across Corruption Severity}
+
+Table~\ref{tab:main} reports every arm at every severity, with mCA and relative
+drop. Figure~\ref{fig:severity} plots the same data.
+
+\begin{table}[t]
+  \centering
+  \caption{Top-1 accuracy (\%) by corruption severity, averaged over four
+  corruption types and three seeds, with across-seed standard deviation. mCA is
+  the mean over severities 1--5; relative drop is
+  $(\text{clean}-\text{mCA})/\text{clean}$, where lower is better.}
+  \label{tab:main}
+  \small
+  \begin{tabular}{lcccccccc}
+    \toprule
+    Model & Clean & Sev.\ 1 & Sev.\ 2 & Sev.\ 3 & Sev.\ 4 & Sev.\ 5 & mCA & Rel.\ drop \\
+    \midrule
+    none & $86.09${\scriptsize$\pm2.10$} & $83.96${\scriptsize$\pm2.25$} & $80.99${\scriptsize$\pm2.93$} & $75.53${\scriptsize$\pm3.00$} & $67.12${\scriptsize$\pm2.84$} & $55.01${\scriptsize$\pm0.99$} & $72.52${\scriptsize$\pm2.31$} & $15.77\%$ \\
+    SE   & $89.21${\scriptsize$\pm0.18$} & $87.29${\scriptsize$\pm0.10$} & $85.05${\scriptsize$\pm0.05$} & $80.09${\scriptsize$\pm0.23$} & $71.98${\scriptsize$\pm0.06$} & $57.16${\scriptsize$\pm0.05$} & $76.31${\scriptsize$\pm0.04$} & $14.45\%$ \\
+    BAM  & $81.56${\scriptsize$\pm2.47$} & $79.28${\scriptsize$\pm2.71$} & $75.51${\scriptsize$\pm3.09$} & $70.08${\scriptsize$\pm3.08$} & $62.83${\scriptsize$\pm2.67$} & $52.91${\scriptsize$\pm2.20$} & $68.12${\scriptsize$\pm2.54$} & $16.49\%$ \\
+    CBAM & $\mathbf{89.32}${\scriptsize$\pm0.08$} & $\mathbf{87.68}${\scriptsize$\pm0.22$} & $\mathbf{85.58}${\scriptsize$\pm0.28$} & $\mathbf{80.94}${\scriptsize$\pm0.67$} & $\mathbf{73.13}${\scriptsize$\pm0.49$} & $\mathbf{58.87}${\scriptsize$\pm0.77$} & $\mathbf{77.24}${\scriptsize$\pm0.45$} & $\mathbf{13.52\%}$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.62\linewidth]{figures/fig_accuracy_vs_severity.png}
+  \caption{Top-1 accuracy against corruption severity, averaged over four
+  corruption types and three seeds, with across-seed standard deviation as error
+  bars. The curves do not cross at any severity: the ordering established on
+  clean data is the ordering at every level of corruption.}
+  \label{fig:severity}
+\end{figure}
+
+Absolute accuracy falls steeply with severity for every arm, from roughly $86$
+to $89$\% clean down to $53$ to $59$\% at severity 5. The arms do not, however,
+change places.
+
+\subsection{Does the Clean Ranking Survive?}
+\label{sec:ranking}
+
+Table~\ref{tab:ranking} answers the title question directly.
+
+\begin{table}[t]
+  \centering
+  \caption{Ranking of the four arms at each condition. No reordering occurs
+  anywhere.}
+  \label{tab:ranking}
+  \small
+  \begin{tabular}{lll}
+    \toprule
+    Condition & Ranking (best first) & Same as clean? \\
+    \midrule
+    Clean (severity 0) & CBAM $>$ SE $>$ none $>$ BAM & --- \\
+    Severity 1 & CBAM $>$ SE $>$ none $>$ BAM & yes \\
+    Severity 2 & CBAM $>$ SE $>$ none $>$ BAM & yes \\
+    Severity 3 & CBAM $>$ SE $>$ none $>$ BAM & yes \\
+    Severity 4 & CBAM $>$ SE $>$ none $>$ BAM & yes \\
+    Severity 5 & CBAM $>$ SE $>$ none $>$ BAM & yes \\
+    mCA (severities 1--5) & CBAM $>$ SE $>$ none $>$ BAM & yes \\
+    Relative robustness drop & CBAM $>$ SE $>$ none $>$ BAM & yes \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\textbf{The clean-accuracy ranking survives.} It is preserved at all five
+severities, on mean corruption accuracy, and on relative robustness drop.
+Figure~\ref{fig:ranking} shows the same result as rank trajectories: a
+reordering would appear as crossing lines, and none occurs. This is the null
+outcome we pre-committed to reporting, and for this method set it means the
+field's single clean-accuracy metric was not a misleading basis for choosing
+among these blocks.
+
+The relative-drop column is worth isolating, because it is the measure designed
+to catch a spurious robustness advantage. CBAM loses $13.52\%$ of its clean
+accuracy, SE $14.45\%$, the baseline $15.77\%$, and BAM $16.49\%$. The ordering
+is unchanged, so CBAM's advantage under corruption is not an artefact of its
+higher starting point: it degrades more slowly in proportional terms as well as
+finishing higher.
+
+This runs against our stated hypothesis. We expected the spatial gates of BAM
+and CBAM to be more fragile than SE's global channel gate under blur and
+contrast reduction. CBAM, which has a spatial gate, in fact degrades the most
+slowly of all four arms. We report the hypothesis as refuted rather than
+quietly restating it.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.58\linewidth]{figures/fig_ranking_stability.png}
+  \caption{Rank position of each arm at clean and at each corruption severity. A
+  reordering would appear as crossing lines; none occurs, which is the paper's
+  central negative result in its most direct form.}
+  \label{fig:ranking}
+\end{figure}
+
+\subsection{What the Two Metrics Can and Cannot Resolve}
+\label{sec:power}
+
+A ranking is only meaningful if its adjacent pairs are separated by more than
+seed noise, and here the two metrics differ in what they can resolve.
+
+On clean accuracy the top two arms are $0.11$ pp apart, against a combined
+across-seed standard deviation of $0.26$ pp. \textbf{Clean accuracy cannot
+distinguish CBAM from SE at this budget.} On mean corruption accuracy the same
+two arms are $0.92$ pp apart against a combined spread of $0.49$ pp, which does
+exceed seed noise.
+
+The corruption measurement therefore resolves a difference between the two best
+arms that the clean measurement cannot. This is a distinct point from the
+ranking result and cuts the other way: the corruption axis did not reorder
+anything, but it discriminated more finely than the metric the field already
+reports. A practitioner choosing between these two blocks on clean top-1 would
+be choosing on a coin flip; the same choice on mCA is supported by the data.
+
+The larger spreads in the table belong to the baseline and BAM arms
+($\pm2.10$ and $\pm2.47$ pp clean, against $\pm0.18$ and $\pm0.08$ pp for SE and
+CBAM). Attention appears to stabilise training across seeds at this budget as
+well as improving the mean, though with three seeds we report this as an
+observation rather than a claim.
+
+\subsection{Per-Corruption Breakdown}
+
+Averaging four corruption types can hide a type-specific skew, so
+Table~\ref{tab:percorr} and Figure~\ref{fig:percorr} report the breakdown.
+
+\begin{table}[t]
+  \centering
+  \caption{Mean accuracy (\%) per corruption type, averaged over severities
+  1--5 and three seeds.}
+  \label{tab:percorr}
+  \small
+  \begin{tabular}{lcccc}
+    \toprule
+    Model & Brightness & Contrast & Defocus blur & Elastic transform \\
+    \midrule
+    none & $83.76$ & $59.66$ & $72.28$ & $74.38$ \\
+    SE   & $86.83$ & $67.06$ & $74.63$ & $76.75$ \\
+    BAM  & $78.66$ & $53.27$ & $69.40$ & $71.16$ \\
+    CBAM & $\mathbf{87.33}$ & $\mathbf{67.53}$ & $\mathbf{76.05}$ & $\mathbf{78.05}$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.86\linewidth]{figures/fig_per_corruption_breakdown.png}
+  \caption{Mean accuracy per corruption type, averaged over severities 1--5 and
+  three seeds. Reporting the breakdown alongside the four-type mean makes a
+  type-specific skew visible: contrast is the most damaging corruption for every
+  arm, and also where the attention arms separate most from the baseline.}
+  \label{fig:percorr}
+\end{figure}
+
+The ordering is identical within every corruption type, so the aggregate is not
+concealing a reversal. Contrast is by far the most damaging corruption, costing
+the baseline $26$ pp relative to brightness, and it is also where the attention
+arms separate most from the baseline: CBAM leads the baseline by $7.9$ pp on
+contrast against $3.6$ pp on brightness. A global channel gate can rescale
+channels whose activations have been uniformly compressed, which is a plausible
+mechanism for that pattern, but our design does not isolate it and we offer it
+as a hypothesis for future work rather than a finding.
+
+\subsection{BAM Underperforms the Attention-Free Baseline}
+\label{sec:bam}
+
+BAM finishes last on every metric, $4.5$ pp below the baseline on clean accuracy
+and $4.4$ pp below on mCA, with the widest across-seed spread of any arm.
+Figure~\ref{fig:drop} shows it also has the largest relative degradation.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.55\linewidth]{figures/fig_relative_robustness_drop.png}
+  \caption{Relative robustness drop, $(\text{clean}-\text{corrupted})/\text{clean}$,
+  per arm with across-seed standard deviation. Normalising by each arm's own
+  clean accuracy prevents an arm that starts lower from appearing robust merely
+  because it had less accuracy to lose; the ordering is unchanged from the
+  absolute measure.}
+  \label{fig:drop}
+\end{figure}
+
+We are deliberately cautious about what this means. At a 10-epoch budget, an arm
+that converges more slowly is indistinguishable from an arm that converges to a
+worse optimum, and BAM is the heaviest module here, with dilated convolutions
+and an extra batch-normalised MLP in every one of the eight blocks. BAM's mean
+final-epoch training accuracy ($82.79$\%) is also the lowest of the four arms,
+against $92.48$\% for CBAM and $87.90$\% for the baseline, which is consistent
+with underfitting rather than with a robustness deficit. We therefore report
+that \emph{BAM did not pay for itself at this budget}, and explicitly do not
+claim that BAM is a worse module than the baseline in general. Section
+\ref{sec:limitations} states what would settle it.
+
+% ── 6. Limitations ────────────────────────────────────────────────────────────
+\section{Limitations}
+\label{sec:limitations}
+
+\textbf{Training budget.} Ten epochs is matched across arms, which is what the
+ranking claim requires, but it is short. Absolute accuracies would rise with a
+longer schedule, and the ordering could in principle change --- most plausibly
+for BAM, whose deficit (Section~\ref{sec:bam}) is consistent with underfitting.
+The single most valuable extension is to rerun the identical grid at a longer
+budget and check whether BAM's deficit closes.
+
+\textbf{Three methods and one baseline.} The design supports per-severity
+descriptive statements about whether the ranking held. It does not support a
+general claim that attention \emph{type} predicts corruption robustness; four
+points do not characterise a design space.
+
+\textbf{Four of the benchmark's corruption types.} Averaging over brightness,
+contrast, defocus blur and elastic transform could flatter or punish spatial
+attention relative to the full benchmark. We report the per-type breakdown
+alongside the mean so a skew is visible, and scope the finding to these four
+types. All types in the source are ungated, so extension is inference-only and
+requires no retraining.
+
+\textbf{Insertion point.} Holding the slot fixed is what buys attribution to the
+module, but it means no arm reproduces its own paper's placement. Absolute
+accuracies are therefore not comparable to published results and none is
+claimed.
+
+\textbf{Three seeds, one dataset, one resolution.} Three seeds is enough to show
+that the top-two clean gap is inside seed noise, but not to place tight
+intervals on the arms with wider spread. Results are CIFAR-scale only.
+
+% ── 7. Conclusion ─────────────────────────────────────────────────────────────
+\section{Conclusion}
+\label{sec:conclusion}
+
+We trained three published attention blocks and an attention-free baseline into
+one shared backbone, at one insertion point, under one budget and one seed set,
+and re-ranked them under common image corruptions rather than on clean accuracy
+alone.
+
+The ranking survived. CBAM $>$ SE $>$ none $>$ BAM holds at every corruption
+severity, on mean corruption accuracy, and on relative degradation. For this
+method set, the clean-accuracy metric the literature reports was not a
+misleading basis for choosing between these blocks, and our hypothesis that
+spatial gates would prove more fragile than a global channel gate was refuted:
+the arm with a spatial gate degraded most slowly.
+
+Two findings qualify that. Clean accuracy could not resolve the top two arms
+while mean corruption accuracy could, so the corruption axis was here the more
+discriminative measurement even though it reordered nothing --- a reason to
+report it that does not depend on it overturning anything. And BAM did not pay
+for itself at this budget, finishing below the attention-free baseline, though
+at ten epochs we cannot separate a worse optimum from slower convergence.
+
+We also record that BAM's official implementation computes a multiplicative gate
+fusion where its paper specifies an additive one. An implementation this widely
+reused differing from its own paper on the fusion operator is worth the
+field's attention independently of our results.
+
+The cheapest extensions are clear: the remaining eleven corruption types are
+ungated and require inference only, and rerunning the identical grid at a longer
+budget would settle whether BAM's deficit is underfitting.
+
+\bibliographystyle{plainnat}
+\bibliography{refs}
+
+\end{document}

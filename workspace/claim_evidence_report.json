@@ -1,0 +1,80 @@
+{
+  "supported": [
+    {
+      "claim": "\\scriptsize$\\pm2.67$} & $52.91${\\scriptsize$\\pm2.20$} & $68.12${\\scriptsize$\\pm2.54$} & $16.49%$ \\\\     CBAM & $\\mathbf{89.32}${\\scriptsize$\\pm0.08$} & $\\mathbf{87.68}${\\scriptsize$\\pm0.22$} & $\\mathb",
+      "value": "89.32",
+      "context": "\\scriptsize$\\pm2.67$} & $52.91${\\scriptsize$\\pm2.20$} & $68.12${\\scriptsize$\\pm2.54$} & $16.49%$ \\\\     CBAM & $\\mathbf{89.32}${\\scriptsize$\\pm0.08$} & $\\mathbf{87.68}${\\scriptsize$\\pm0.22$} & $\\mathbf{85.58}${\\scriptsize$\\pm0.28$} & $\\mathbf{80.",
+      "evidence_snippet": "tion: - none: 86.09 +/- 2.10 - SE: 89.21 +/- 0.18 - BAM: 81.56 +/- 2.47 - CBAM: 89.32 +/- 0.08  Mean corruption accuracy by severity, percent, averaged over 4 corrup"
+    },
+    {
+      "claim": "ze$\\pm2.20$} & $68.12${\\scriptsize$\\pm2.54$} & $16.49%$ \\\\     CBAM & $\\mathbf{89.32}${\\scriptsize$\\pm0.08$} & $\\mathbf{87.68}${\\scriptsize$\\pm0.22$} & $\\mathbf{85.58}${\\scriptsize$\\pm0.28$} & $\\mathb",
+      "value": "87.68",
+      "context": "ze$\\pm2.20$} & $68.12${\\scriptsize$\\pm2.54$} & $16.49%$ \\\\     CBAM & $\\mathbf{89.32}${\\scriptsize$\\pm0.08$} & $\\mathbf{87.68}${\\scriptsize$\\pm0.22$} & $\\mathbf{85.58}${\\scriptsize$\\pm0.28$} & $\\mathbf{80.94}${\\scriptsize$\\pm0.67$} & $\\mathbf{73.",
+      "evidence_snippet": "- 3.08, severity 4 62.83 +/- 2.67, severity 5 52.91 +/- 2.20 - CBAM: severity 1 87.68 +/- 0.22, severity 2 85.58 +/- 0.28, severity 3 80.94 +/- 0.67, severity 4 73.1"
+    },
+    {
+      "claim": "4$} & $16.49%$ \\\\     CBAM & $\\mathbf{89.32}${\\scriptsize$\\pm0.08$} & $\\mathbf{87.68}${\\scriptsize$\\pm0.22$} & $\\mathbf{85.58}${\\scriptsize$\\pm0.28$} & $\\mathbf{80.94}${\\scriptsize$\\pm0.67$} & $\\mathb",
+      "value": "85.58",
+      "context": "4$} & $16.49%$ \\\\     CBAM & $\\mathbf{89.32}${\\scriptsize$\\pm0.08$} & $\\mathbf{87.68}${\\scriptsize$\\pm0.22$} & $\\mathbf{85.58}${\\scriptsize$\\pm0.28$} & $\\mathbf{80.94}${\\scriptsize$\\pm0.67$} & $\\mathbf{73.13}${\\scriptsize$\\pm0.49$} & $\\mathbf{58.",
+      "evidence_snippet": "- 2.67, severity 5 52.91 +/- 2.20 - CBAM: severity 1 87.68 +/- 0.22, severity 2 85.58 +/- 0.28, severity 3 80.94 +/- 0.67, severity 4 73.13 +/- 0.49, severity 5 58.8"
+    },
+    {
+      "claim": "32}${\\scriptsize$\\pm0.08$} & $\\mathbf{87.68}${\\scriptsize$\\pm0.22$} & $\\mathbf{85.58}${\\scriptsize$\\pm0.28$} & $\\mathbf{80.94}${\\scriptsize$\\pm0.67$} & $\\mathbf{73.13}${\\scriptsize$\\pm0.49$} & $\\mathb",
+      "value": "80.94",
+      "context": "32}${\\scriptsize$\\pm0.08$} & $\\mathbf{87.68}${\\scriptsize$\\pm0.22$} & $\\mathbf{85.58}${\\scriptsize$\\pm0.28$} & $\\mathbf{80.94}${\\scriptsize$\\pm0.67$} & $\\mathbf{73.13}${\\scriptsize$\\pm0.49$} & $\\mathbf{58.87}${\\scriptsize$\\pm0.77$} & $\\mathbf{77.",
+      "evidence_snippet": "- 2.20 - CBAM: severity 1 87.68 +/- 0.22, severity 2 85.58 +/- 0.28, severity 3 80.94 +/- 0.67, severity 4 73.13 +/- 0.49, severity 5 58.87 +/- 0.77  Mean corruption"
+    },
+    {
+      "claim": "68}${\\scriptsize$\\pm0.22$} & $\\mathbf{85.58}${\\scriptsize$\\pm0.28$} & $\\mathbf{80.94}${\\scriptsize$\\pm0.67$} & $\\mathbf{73.13}${\\scriptsize$\\pm0.49$} & $\\mathbf{58.87}${\\scriptsize$\\pm0.77$} & $\\mathb",
+      "value": "73.13",
+      "context": "68}${\\scriptsize$\\pm0.22$} & $\\mathbf{85.58}${\\scriptsize$\\pm0.28$} & $\\mathbf{80.94}${\\scriptsize$\\pm0.67$} & $\\mathbf{73.13}${\\scriptsize$\\pm0.49$} & $\\mathbf{58.87}${\\scriptsize$\\pm0.77$} & $\\mathbf{77.24}${\\scriptsize$\\pm0.45$} & $\\mathbf{13.",
+      "evidence_snippet": "7.68 +/- 0.22, severity 2 85.58 +/- 0.28, severity 3 80.94 +/- 0.67, severity 4 73.13 +/- 0.49, severity 5 58.87 +/- 0.77  Mean corruption accuracy across all severi"
+    },
+    {
+      "claim": "58}${\\scriptsize$\\pm0.28$} & $\\mathbf{80.94}${\\scriptsize$\\pm0.67$} & $\\mathbf{73.13}${\\scriptsize$\\pm0.49$} & $\\mathbf{58.87}${\\scriptsize$\\pm0.77$} & $\\mathbf{77.24}${\\scriptsize$\\pm0.45$} & $\\mathb",
+      "value": "58.87",
+      "context": "58}${\\scriptsize$\\pm0.28$} & $\\mathbf{80.94}${\\scriptsize$\\pm0.67$} & $\\mathbf{73.13}${\\scriptsize$\\pm0.49$} & $\\mathbf{58.87}${\\scriptsize$\\pm0.77$} & $\\mathbf{77.24}${\\scriptsize$\\pm0.45$} & $\\mathbf{13.52%}$ \\\\     \\bottomrule         [t]   \\c",
+      "evidence_snippet": "5.58 +/- 0.28, severity 3 80.94 +/- 0.67, severity 4 73.13 +/- 0.49, severity 5 58.87 +/- 0.77  Mean corruption accuracy across all severities (mCA), percent: - none"
+    },
+    {
+      "claim": "94}${\\scriptsize$\\pm0.67$} & $\\mathbf{73.13}${\\scriptsize$\\pm0.49$} & $\\mathbf{58.87}${\\scriptsize$\\pm0.77$} & $\\mathbf{77.24}${\\scriptsize$\\pm0.45$} & $\\mathbf{13.52%}$ \\\\     \\bottomrule         [t]",
+      "value": "77.24",
+      "context": "94}${\\scriptsize$\\pm0.67$} & $\\mathbf{73.13}${\\scriptsize$\\pm0.49$} & $\\mathbf{58.87}${\\scriptsize$\\pm0.77$} & $\\mathbf{77.24}${\\scriptsize$\\pm0.45$} & $\\mathbf{13.52%}$ \\\\     \\bottomrule         [t]   \\centering   \\includegraphics[width=0.62\\li",
+      "evidence_snippet": "cent: - none: 72.52 +/- 2.31 - SE: 76.31 +/- 0.04 - BAM: 68.12 +/- 2.54 - CBAM: 77.24 +/- 0.45  Mean accuracy per corruption type, percent, averaged over severities"
+    },
+    {
+      "claim": "SE   & $86.83$ & $67.06$ & $74.63$ & $76.75$ \\\\     BAM  & $78.66$ & $53.27$ & $69.40$ & $71.16$ \\\\     CBAM & $\\mathbf{87.33}$ & $\\mathbf{67.53}$ & $\\mathbf{76.05}$ & $\\mathbf{78.05}$ \\\\     \\bottomr",
+      "value": "87.33",
+      "context": "SE   & $86.83$ & $67.06$ & $74.63$ & $76.75$ \\\\     BAM  & $78.66$ & $53.27$ & $69.40$ & $71.16$ \\\\     CBAM & $\\mathbf{87.33}$ & $\\mathbf{67.53}$ & $\\mathbf{76.05}$ & $\\mathbf{78.05}$ \\\\     \\bottomrule         [t]   \\centering   \\includegraphic",
+      "evidence_snippet": "contrast 53.27, defocus_blur 69.40, elastic_transform 71.16 - CBAM: brightness 87.33, contrast 67.53, defocus_blur 76.05, elastic_transform 78.05  Final-epoch train"
+    },
+    {
+      "claim": "7.06$ & $74.63$ & $76.75$ \\\\     BAM  & $78.66$ & $53.27$ & $69.40$ & $71.16$ \\\\     CBAM & $\\mathbf{87.33}$ & $\\mathbf{67.53}$ & $\\mathbf{76.05}$ & $\\mathbf{78.05}$ \\\\     \\bottomrule         [t]   \\",
+      "value": "67.53",
+      "context": "7.06$ & $74.63$ & $76.75$ \\\\     BAM  & $78.66$ & $53.27$ & $69.40$ & $71.16$ \\\\     CBAM & $\\mathbf{87.33}$ & $\\mathbf{67.53}$ & $\\mathbf{76.05}$ & $\\mathbf{78.05}$ \\\\     \\bottomrule         [t]   \\centering   \\includegraphics[width=0.86\\linewi",
+      "evidence_snippet": "defocus_blur 69.40, elastic_transform 71.16 - CBAM: brightness 87.33, contrast 67.53, defocus_blur 76.05, elastic_transform 78.05  Final-epoch training accuracy, pe"
+    },
+    {
+      "claim": "76.75$ \\\\     BAM  & $78.66$ & $53.27$ & $69.40$ & $71.16$ \\\\     CBAM & $\\mathbf{87.33}$ & $\\mathbf{67.53}$ & $\\mathbf{76.05}$ & $\\mathbf{78.05}$ \\\\     \\bottomrule         [t]   \\centering   \\includ",
+      "value": "76.05",
+      "context": "76.75$ \\\\     BAM  & $78.66$ & $53.27$ & $69.40$ & $71.16$ \\\\     CBAM & $\\mathbf{87.33}$ & $\\mathbf{67.53}$ & $\\mathbf{76.05}$ & $\\mathbf{78.05}$ \\\\     \\bottomrule         [t]   \\centering   \\includegraphics[width=0.86\\linewidth]{figures/fig_pe",
+      "evidence_snippet": "elastic_transform 71.16 - CBAM: brightness 87.33, contrast 67.53, defocus_blur 76.05, elastic_transform 78.05  Final-epoch training accuracy, percent, mean over see"
+    },
+    {
+      "claim": "& $78.66$ & $53.27$ & $69.40$ & $71.16$ \\\\     CBAM & $\\mathbf{87.33}$ & $\\mathbf{67.53}$ & $\\mathbf{76.05}$ & $\\mathbf{78.05}$ \\\\     \\bottomrule         [t]   \\centering   \\includegraphics[width=0.8",
+      "value": "78.05",
+      "context": "& $78.66$ & $53.27$ & $69.40$ & $71.16$ \\\\     CBAM & $\\mathbf{87.33}$ & $\\mathbf{67.53}$ & $\\mathbf{76.05}$ & $\\mathbf{78.05}$ \\\\     \\bottomrule         [t]   \\centering   \\includegraphics[width=0.86\\linewidth]{figures/fig_per_corruption_breakd",
+      "evidence_snippet": "- CBAM: brightness 87.33, contrast 67.53, defocus_blur 76.05, elastic_transform 78.05  Final-epoch training accuracy, percent, mean over seeds (reported because it s"
+    }
+  ],
+  "unsupported": [],
+  "uncertain": [],
+  "skipped": [],
+  "summary": {
+    "total": 11,
+    "supported": 11,
+    "unsupported": 0,
+    "uncertain": 0,
+    "skipped": 0
+  }
+}
