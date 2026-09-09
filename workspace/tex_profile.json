@@ -1,0 +1,22 @@
+{
+  "available": [],
+  "missing": [
+    "cleveref",
+    "nicefrac",
+    "microtype",
+    "url",
+    "booktabs",
+    "natbib",
+    "hyperref",
+    "fontenc",
+    "times",
+    "lmodern"
+  ],
+  "use_cleveref": false,
+  "use_nicefrac": false,
+  "use_microtype": false,
+  "use_t1_fontenc": false,
+  "tex_binary": null,
+  "error": "pdflatex not found in PATH or known locations",
+  "checked_at": "2026-09-09T08:34:01.378291"
+}

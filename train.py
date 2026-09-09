@@ -68,11 +68,14 @@ def get_rng_state():
 
 
 def set_rng_state(state):
-    torch.set_rng_state(state["torch"])
+    # set_rng_state requires CPU ByteTensors. Checkpoints written before the
+    # map_location fix below were loaded onto the GPU, so coerce defensively
+    # rather than failing the resume of an already-trained run.
+    torch.set_rng_state(state["torch"].cpu().to(torch.uint8))
     np.random.set_state(state["numpy"])
     random.setstate(state["random"])
     if torch.cuda.is_available() and "cuda" in state:
-        torch.cuda.set_rng_state_all(state["cuda"])
+        torch.cuda.set_rng_state_all([s.cpu().to(torch.uint8) for s in state["cuda"]])
 
 
 def get_dataloaders(data_dir, batch_size, num_workers):
@@ -194,7 +197,11 @@ def main():
     resuming = state_path.exists() and not args.no_resume
 
     if resuming:
-        state = torch.load(state_path, map_location=device, weights_only=False)  # trusted: written by this script
+        # map_location="cpu", not the device: loading onto CUDA turns the saved
+        # RNG state into a CUDA tensor, which torch.set_rng_state rejects.
+        # load_state_dict copies CPU tensors into the already-on-device model,
+        # and the optimizer moves its own state to the parameter device.
+        state = torch.load(state_path, map_location="cpu", weights_only=False)  # trusted: written by this script
         frozen = state["config"]
         for key in FROZEN_CONFIG_KEYS:
             # .get keeps state files written before a key was frozen loadable
