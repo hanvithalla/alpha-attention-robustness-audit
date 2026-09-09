@@ -18,9 +18,9 @@ def get_attention_module(attention_type, channels, reduction=16):
     if attention_type == "SE":
         return SEBlock(channels, reduction=reduction)
     if attention_type == "BAM":
-        return BAMBlock(channels, reduction=reduction)
+        return BAMBlock(channels, reduction_ratio=reduction)
     if attention_type == "CBAM":
-        return CBAMBlock(channels, reduction=reduction)
+        return CBAMBlock(channels, reduction_ratio=reduction)
     raise ValueError(f"Unknown attention_type: {attention_type!r}")
 
 
